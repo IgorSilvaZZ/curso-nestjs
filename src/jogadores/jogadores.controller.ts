@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
   @Post()
-  async criarAtualizarJogador() {
+  async criarAtualizarJogador(@Body() criarJogadorDTO: CriarJogadorDTO) {
     return {
-      nome: 'Igor',
+      criarJogadorDTO,
     };
   }
 }
