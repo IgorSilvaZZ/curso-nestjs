@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { Injectable, Logger } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { randomUUID } from 'node:crypto';
 
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
@@ -26,6 +27,32 @@ export class JogadoresService {
 
   async consultarTodosJogadores(): Promise<IJogador[]> {
     return this.jogadores;
+  }
+
+  async consultarJogadoresPeloEmail(email: string): Promise<IJogador> {
+    const jogadorEncontrado = this.encontrarJogadorPorEmail(email);
+
+    if (!jogadorEncontrado) {
+      throw new NotFoundException(
+        `Jogador não encontrado com email ${email} não encontrado!`,
+      );
+    }
+
+    return jogadorEncontrado;
+  }
+
+  async deletarJogador(email: string): Promise<void> {
+    const jogadorEncontrado = this.encontrarJogadorPorEmail(email);
+
+    if (!jogadorEncontrado) {
+      throw new NotFoundException(
+        `Jogador não encontrado com email ${email} não encontrado!`,
+      );
+    }
+
+    this.jogadores = this.jogadores.filter(
+      (jogador) => jogador.email !== email,
+    );
   }
 
   private criar(criarJogadorDTO: CriarJogadorDTO): void {
