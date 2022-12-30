@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Schema, Prop } from '@nestjs/mongoose';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true, collection: 'jogadores' })
 export class Jogador {
@@ -22,3 +22,5 @@ export class Jogador {
   @Prop()
   urlFotoJogador: string;
 }
+
+export const JogadoresSchema = SchemaFactory.createForClass(Jogador);

@@ -8,7 +8,7 @@ import { JogadoresModule } from './jogadores/jogadores.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
-      'mongodb+srv://igorsilva:Lo159c@17@cluster0.xuxnahp.mongodb.net/smartranking?retryWrites=true&w=majority',
+      'mongodb://admin:senha@localhost:27017/smartranking?authMechanism=DEFAULT&authSource=admin&directConnection=true',
     ),
     JogadoresModule,
   ],
