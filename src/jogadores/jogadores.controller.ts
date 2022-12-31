@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
 
 import { Body, Controller, Get, Post, Delete } from '@nestjs/common';
-import { Query } from '@nestjs/common/decorators';
+import { Query, UsePipes } from '@nestjs/common/decorators';
+import { ValidationPipe } from '@nestjs/common/pipes';
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 import { IJogador } from './interfaces/jogador.interface';
 import { JogadoresService } from './jogadores.service';
@@ -11,6 +12,7 @@ export class JogadoresController {
   constructor(private readonly jogadoresService: JogadoresService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   async criarAtualizarJogador(@Body() criarJogadorDTO: CriarJogadorDTO) {
     this.jogadoresService.criarAtualizarJogador(criarJogadorDTO);
   }
