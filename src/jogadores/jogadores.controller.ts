@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
-import { Body, Controller, Get, Post, Delete } from '@nestjs/common';
-import { Query, UsePipes } from '@nestjs/common/decorators';
+import { Body, Controller, Get, Post, Delete, Put } from '@nestjs/common';
+import { Param, UsePipes } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
 
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
@@ -15,27 +15,34 @@ export class JogadoresController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async criarAtualizarJogador(
+  async criarJogador(@Body() criarJogadorDTO: CriarJogadorDTO): Promise<void> {
+    await this.jogadoresService.criarJogador(criarJogadorDTO);
+  }
+
+  @Put('/:_id')
+  async atualizarJogador(
+    @Param('_id', JogadoresValidacaoParametrosPipe) _id: string,
     @Body() criarJogadorDTO: CriarJogadorDTO,
   ): Promise<void> {
-    return await this.jogadoresService.criarAtualizarJogador(criarJogadorDTO);
+    await this.jogadoresService.atualizarJogador(_id, criarJogadorDTO);
   }
 
   @Get()
-  async consultarJogadores(
-    @Query('email', JogadoresValidacaoParametrosPipe) email: string,
-  ): Promise<IJogador[] | IJogador> {
-    if (email) {
-      return this.jogadoresService.consultarJogadoresPeloEmail(email);
-    } else {
-      return this.jogadoresService.consultarTodosJogadores();
-    }
+  async consultarJogadores(): Promise<IJogador[] | IJogador> {
+    return this.jogadoresService.consultarTodosJogadores();
   }
 
-  @Delete()
+  @Get('/:_id')
+  async consultarJogadorPorId(
+    @Param('_id', JogadoresValidacaoParametrosPipe) _id: string,
+  ): Promise<IJogador | null> {
+    return await this.jogadoresService.consultarJogadorPeloId(_id);
+  }
+
+  @Delete('/:_id')
   async deletarJogador(
-    @Query('email', JogadoresValidacaoParametrosPipe) email: string,
+    @Param('_id', JogadoresValidacaoParametrosPipe) _id: string,
   ): Promise<void> {
-    return await this.jogadoresService.deletarJogador(email);
+    return await this.jogadoresService.deletarJogador(_id);
   }
 }
