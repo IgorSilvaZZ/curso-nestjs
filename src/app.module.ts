@@ -2,6 +2,7 @@
 
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CategoriasModule } from './categorias/categorias.module';
 
 import { JogadoresModule } from './jogadores/jogadores.module';
 
@@ -11,6 +12,7 @@ import { JogadoresModule } from './jogadores/jogadores.module';
       'mongodb://admin:senha@localhost:27017/smartranking?authMechanism=DEFAULT&authSource=admin&directConnection=true',
     ),
     JogadoresModule,
+    CategoriasModule,
   ],
   controllers: [],
   providers: [],
