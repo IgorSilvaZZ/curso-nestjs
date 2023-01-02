@@ -8,12 +8,13 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 import { IJogador } from './interfaces/jogador.interface';
 
 @Injectable()
 export class JogadoresService {
-  // Objeto para realizar loggs para debug na aplicação
+  // Objeto para realizar logs para debug na aplicação
   // private readonly logger = new Logger(JogadoresService.name);
 
   constructor(
@@ -38,7 +39,7 @@ export class JogadoresService {
 
   async atualizarJogador(
     _id: string,
-    criarJogadorDTO: CriarJogadorDTO,
+    atualizarJogadorDTO: AtualizarJogadorDTO,
   ): Promise<void> {
     const jogadorEncontrado = await this.consultarJogadorPeloId(_id);
 
@@ -47,7 +48,7 @@ export class JogadoresService {
     }
 
     await this.jogadorModel
-      .findOneAndUpdate({ _id }, { $set: criarJogadorDTO })
+      .findOneAndUpdate({ _id }, { $set: atualizarJogadorDTO })
       .exec();
   }
 
@@ -67,22 +68,32 @@ export class JogadoresService {
     return jogadorEncontrado;
   }
 
-  async consultarJogadorPeloId(_id: string): Promise<IJogador | null> {
-    const jogadorEncontrado = await this.jogadorModel.findOne({ _id }).exec();
+  async consultarJogadorPeloId(_id: string): Promise<IJogador> {
+    const jogadorEncontrado = await this.encontrarJogadorPorId(_id);
+
+    if (!jogadorEncontrado) {
+      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
+    }
 
     return jogadorEncontrado;
   }
 
-  async deletarJogador(email: string): Promise<any> {
-    const jogadorEncontrado = await this.encontrarJogadorPorEmail(email);
+  async deletarJogador(_id: string): Promise<any> {
+    const jogadorEncontrado = await this.encontrarJogadorPorId(_id);
 
     if (!jogadorEncontrado) {
       throw new NotFoundException(
-        `Jogador não encontrado com email ${email} não encontrado!`,
+        `Jogador não encontrado com email ${_id} não encontrado!`,
       );
     }
 
-    return await this.jogadorModel.deleteOne({ email }).exec();
+    return await this.jogadorModel.deleteOne({ _id }).exec();
+  }
+
+  private async encontrarJogadorPorId(_id: string): Promise<IJogador | null> {
+    const jogadorEncontrado = await this.jogadorModel.findOne({ _id }).exec();
+
+    return jogadorEncontrado;
   }
 
   private async encontrarJogadorPorEmail(

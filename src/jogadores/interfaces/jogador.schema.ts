@@ -10,7 +10,7 @@ export class Jogador {
   @Prop({ unique: true })
   email: string;
 
-  @Prop({ unique: true })
+  @Prop()
   telefoneCelular: string;
 
   @Prop()
