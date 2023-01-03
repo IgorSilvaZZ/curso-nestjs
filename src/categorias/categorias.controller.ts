@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Body, Post } from '@nestjs/common';
-import { UsePipes } from '@nestjs/common/decorators';
+import { Controller, Body, Post, Get } from '@nestjs/common';
+import { Param, UsePipes } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
 
 import { CategoriasService } from './categorias.service';
@@ -18,5 +18,17 @@ export class CategoriasController {
     @Body() criarCategoriaDTO: CriaCategoriaDTO,
   ): Promise<ICategoria> {
     return await this.categoriasService.criarCategoria(criarCategoriaDTO);
+  }
+
+  @Get()
+  async consultarCategorias(): Promise<ICategoria[]> {
+    return await this.categoriasService.consultarTodasCategorias();
+  }
+
+  @Get('/:categoria')
+  async consultarCategoriaPorId(
+    @Param('categoria') categoria: string,
+  ): Promise<ICategoria> {
+    return await this.categoriasService.consultarCategoriaPeloId(categoria);
   }
 }
