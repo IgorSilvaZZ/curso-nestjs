@@ -7,16 +7,19 @@ import {
 } from '@nestjs/common/exceptions';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
 
+import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
 import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
 import { ICategoria } from './interfaces/categoria.interface';
+
+import { JogadoresService } from 'src/jogadores/jogadores.service';
 
 @Injectable()
 export class CategoriasService {
   constructor(
     @InjectModel('categoria')
     private readonly categoriaModel: Model<ICategoria>,
+    private readonly jogadoresService: JogadoresService,
   ) {}
 
   async criarCategoria(
@@ -81,10 +84,20 @@ export class CategoriasService {
       .findOne({ categoria })
       .exec();
 
-    /* const jogadorJaCadastrado */
+    const jogadorJaCadastradoCategoria = await this.categoriaModel
+      .find({ categoria })
+      .where('jogadores')
+      .in(idJogador)
+      .exec();
+
+    await this.jogadoresService.consultarJogadorPeloId(idJogador);
 
     if (!categoriaEncontrada) {
       throw new NotFoundException('Categoria não encontrada!');
+    }
+
+    if (jogadorJaCadastradoCategoria.length > 0) {
+      throw new BadRequestException('Jogador já cadastrado nessa categoria');
     }
 
     categoriaEncontrada.jogadores.push(idJogador);
