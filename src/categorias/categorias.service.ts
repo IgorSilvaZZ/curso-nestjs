@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common/exceptions';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
 
 import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
 import { ICategoria } from './interfaces/categoria.interface';
@@ -37,7 +38,10 @@ export class CategoriasService {
   }
 
   async consultarTodasCategorias(): Promise<ICategoria[]> {
-    return await this.categoriaModel.find().exec();
+    return await this.categoriaModel
+      .find()
+      .populate([{ path: 'jogadores', model: 'jogador' }])
+      .exec();
   }
 
   async consultarCategoriaPeloId(categoria: string): Promise<ICategoria> {
@@ -50,5 +54,43 @@ export class CategoriasService {
     }
 
     return categoriaEncontrada;
+  }
+
+  async atualizarCategoria(
+    categoria: string,
+    atualizarCategoriaDTO: AtualizarCategoriaDTO,
+  ): Promise<void> {
+    const categoriaEncontrada = await this.categoriaModel
+      .findOne({ categoria })
+      .exec();
+
+    if (!categoriaEncontrada) {
+      throw new NotFoundException('Categoria não encontrada!');
+    }
+
+    await this.categoriaModel
+      .findOneAndUpdate({ categoria }, { $set: atualizarCategoriaDTO })
+      .exec();
+  }
+
+  async atribuirCategoriaJogador(params: string[]): Promise<void> {
+    const categoria = params['categoria'];
+    const idJogador = params['idJogador'];
+
+    const categoriaEncontrada = await this.categoriaModel
+      .findOne({ categoria })
+      .exec();
+
+    /* const jogadorJaCadastrado */
+
+    if (!categoriaEncontrada) {
+      throw new NotFoundException('Categoria não encontrada!');
+    }
+
+    categoriaEncontrada.jogadores.push(idJogador);
+
+    await this.categoriaModel
+      .findOneAndUpdate({ categoria }, { $set: categoriaEncontrada })
+      .exec();
   }
 }
