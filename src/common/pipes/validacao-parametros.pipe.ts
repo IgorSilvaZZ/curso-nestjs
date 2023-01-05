@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 
-export class JogadoresValidacaoParametrosPipe implements PipeTransform {
+export class ValidacaoParametrosPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     // console.log(`value: ${value} metadata: ${metadata.type}`);
 
