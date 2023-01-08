@@ -106,4 +106,16 @@ export class CategoriasService {
       .findOneAndUpdate({ categoria }, { $set: categoriaEncontrada })
       .exec();
   }
+
+  async consultarCategoriaPorJogador(idJogador: string): Promise<ICategoria> {
+    const categoriaJogador = await this.categoriaModel
+      .findOne({ jogadores: idJogador })
+      .exec();
+
+    if (!categoriaJogador) {
+      throw new NotFoundException('Jogador atribuido a nenhuma categoria');
+    }
+
+    return categoriaJogador;
+  }
 }
