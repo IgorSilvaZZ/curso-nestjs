@@ -12,11 +12,12 @@ import {
   UsePipes,
 } from '@nestjs/common/decorators';
 import { ValidationPipe } from '@nestjs/common/pipes';
-import { DesafiosService } from './desafios.service';
 
+import { DesafiosService } from './desafios.service';
 import { CriarDesafioDTO } from './dtos/criarDesafio.dto';
 import { AtualizarDesafioDTO } from './dtos/atualizarDesafio.dto';
 import { IDesafio } from './interfaces/desafios.interface';
+import { AtribuirDesafioPartidaDTO } from './dtos/atribuirDesafioPartida.dto';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -55,5 +56,16 @@ export class DesafiosController {
   @UsePipes(ValidationPipe)
   async deletarDesafio(@Param('idDesafio') idDesafio: string) {
     await this.desafiosService.deletarDesafio(idDesafio);
+  }
+
+  @Post('/:idDesafio/partida')
+  async atribuirPartidaDesafio(
+    @Body() atribuirDesafioPartidaDTO: AtribuirDesafioPartidaDTO,
+    @Param('idDesafio') idDesafio: string,
+  ): Promise<IDesafio | null> {
+    return await this.desafiosService.atribuirDesafioPartida(
+      idDesafio,
+      atribuirDesafioPartidaDTO,
+    );
   }
 }

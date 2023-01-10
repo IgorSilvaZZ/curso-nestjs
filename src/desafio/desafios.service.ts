@@ -18,12 +18,16 @@ import { CriarDesafioDTO } from './dtos/criarDesafio.dto';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 import { IDesafio } from './interfaces/desafios.interface';
 import { AtualizarDesafioDTO } from './dtos/atualizarDesafio.dto';
+import { AtribuirDesafioPartidaDTO } from './dtos/atribuirDesafioPartida.dto';
+import { IPartida } from './interfaces/partidas.interface';
 
 @Injectable()
 export class DesafiosService {
   constructor(
     @InjectModel('desafio')
     private readonly desafioModel: Model<IDesafio>,
+    @InjectModel('partida')
+    private readonly partidaModel: Model<IPartida>,
     private readonly jogadoresService: JogadoresService,
     private readonly categoriasService: CategoriasService,
   ) {}
@@ -66,7 +70,10 @@ export class DesafiosService {
   async consultarDesafios(): Promise<IDesafio[]> {
     return await this.desafioModel
       .find()
-      .populate([{ path: 'jogadores', model: 'jogador' }])
+      .populate([
+        { path: 'jogadores', model: 'jogador' },
+        { path: 'partida', model: 'partida' },
+      ])
       .exec();
   }
 
@@ -116,5 +123,43 @@ export class DesafiosService {
         { $set: { status: IDesafioStatusEnum.CANCELADO } },
       )
       .exec();
+  }
+
+  async atribuirDesafioPartida(
+    idDesafio: string,
+    atribuirDesafioPartidaDTO: AtribuirDesafioPartidaDTO,
+  ): Promise<IDesafio | null> {
+    const desafioEncontrado = await this.desafioModel
+      .findOne({ _id: idDesafio })
+      .exec();
+
+    if (!desafioEncontrado) {
+      throw new NotFoundException('Desafio não encontrado!');
+    }
+
+    const jogadorFazParteDesafio = await this.desafioModel
+      .findOne({ jogadores: atribuirDesafioPartidaDTO.def })
+      .exec();
+
+    if (!jogadorFazParteDesafio) {
+      throw new BadRequestException('Jogador não faz parte do desafio!');
+    }
+
+    const novaPartida = {
+      categoria: desafioEncontrado.categoria,
+      def: atribuirDesafioPartidaDTO.def,
+      resultado: atribuirDesafioPartidaDTO.resultado,
+    };
+
+    const partidaCriada = new this.partidaModel(novaPartida);
+
+    await partidaCriada.save();
+
+    return await this.desafioModel.findOneAndUpdate(
+      { _id: idDesafio },
+      {
+        $set: { status: IDesafioStatusEnum.REALIZADO, partida: partidaCriada },
+      },
+    );
   }
 }

@@ -4,6 +4,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
 import { Jogador } from '../../jogadores/interfaces/jogador.schema';
+import { IResultado } from './partidas.interface';
 
 @Schema({ timestamps: true, collection: 'partidas' })
 export class Partida {
@@ -14,7 +15,7 @@ export class Partida {
   def: Jogador;
 
   @Prop()
-  resultado: string;
+  resultado: IResultado[];
 }
 
 export const PartidasSchema = SchemaFactory.createForClass(Partida);
