@@ -9,8 +9,6 @@ import {
 } from 'class-validator';
 import { IJogador } from 'src/jogadores/interfaces/jogador.interface';
 
-import { Jogador } from 'src/jogadores/interfaces/jogador.schema';
-
 export class CriarDesafioDTO {
   @IsNotEmpty()
   @IsDateString()
