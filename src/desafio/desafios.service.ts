@@ -7,10 +7,6 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import ptBR from 'dayjs/locale/pt-br';
 
 import { CategoriasService } from '../categorias/categorias.service';
 import { JogadoresService } from '../jogadores/jogadores.service';
@@ -44,7 +40,7 @@ export class DesafiosService {
 
     if (!jogadorFazParteDesafio) {
       throw new BadRequestException(
-        'O solicitante não faz parte da lista de jogadores!',
+        'O solicitante deve ser um jogador da partida!',
       );
     }
 
@@ -53,7 +49,13 @@ export class DesafiosService {
         criarDesafioDTO.solicitante,
       );
 
-    const dataHoraSolicitacao = dayjs(new Date()).locale(ptBR).format();
+    if (!jogadorCategoria) {
+      throw new BadRequestException(
+        'O solicitante precisa estar registrado em uma categoria!',
+      );
+    }
+
+    const dataHoraSolicitacao = new Date();
 
     const novoDesafio = {
       ...criarDesafioDTO,
