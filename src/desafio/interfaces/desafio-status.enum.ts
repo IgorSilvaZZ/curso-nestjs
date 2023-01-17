@@ -12,4 +12,7 @@ export enum IDesafioAtualizarStatusEnum {
   ACEITO = 'ACEITO',
   NEGADO = 'NEGADO',
   CANCELADO = 'CANCELADO',
+  aceito = 'aceito',
+  negado = 'negado',
+  cancelado = 'cancelado',
 }

@@ -35,7 +35,7 @@ export class DesafiosController {
   @UsePipes(ValidationPipe)
   async consultarDesafios(
     @Query('idJogador') idJogador: string,
-  ): Promise<IDesafio[] | IDesafio | null | undefined> {
+  ): Promise<IDesafio[]> {
     if (idJogador) {
       return await this.desafiosService.consultarDesafiosDeUmJogador(idJogador);
     } else {

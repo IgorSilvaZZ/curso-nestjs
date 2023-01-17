@@ -73,24 +73,28 @@ export class DesafiosService {
     return await this.desafioModel
       .find()
       .populate([
+        { path: 'solicitante', model: 'jogador' },
         { path: 'jogadores', model: 'jogador' },
         { path: 'partida', model: 'partida' },
       ])
       .exec();
   }
 
-  async consultarDesafiosDeUmJogador(
-    idJogador: string,
-  ): Promise<IDesafio | null> {
-    const jogadorEncontrado = await this.desafioModel
-      .findOne({ jogadores: idJogador })
+  async consultarDesafiosDeUmJogador(idJogador: string): Promise<IDesafio[]> {
+    await this.jogadoresService.consultarJogadorPeloId(idJogador);
+
+    const _id = idJogador;
+
+    return await this.desafioModel
+      .find()
+      .where('jogadores')
+      .in([_id])
+      .populate([
+        { path: 'solicitante', model: 'jogador' },
+        { path: 'jogadores', model: 'jogador' },
+        { path: 'partida', model: 'partida' },
+      ])
       .exec();
-
-    if (!jogadorEncontrado) {
-      throw new NotFoundException('Jogador não contém desafios!');
-    }
-
-    return jogadorEncontrado;
   }
 
   async atualizarDesafio(
@@ -105,8 +109,20 @@ export class DesafiosService {
       throw new NotFoundException('Desafio nao encontrado!');
     }
 
+    let dataHoraResposta;
+
+    if (atualizarDesafioDTO.status) {
+      dataHoraResposta = new Date();
+    }
+
+    const desafioAtualizado = {
+      ...atualizarDesafioDTO,
+      dataHoraDesafio: atualizarDesafioDTO.dataHoraDesafio,
+      dataHoraResposta,
+    };
+
     await this.desafioModel
-      .findOneAndUpdate({ _id: idDesafio }, { $set: atualizarDesafioDTO })
+      .findOneAndUpdate({ _id: idDesafio }, { $set: desafioAtualizado })
       .exec();
   }
 
