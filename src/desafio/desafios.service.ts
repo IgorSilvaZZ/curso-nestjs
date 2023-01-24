@@ -3,6 +3,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -146,7 +147,7 @@ export class DesafiosService {
   async atribuirDesafioPartida(
     idDesafio: string,
     atribuirDesafioPartidaDTO: AtribuirDesafioPartidaDTO,
-  ): Promise<IDesafio | null> {
+  ): Promise<void> {
     const desafioEncontrado = await this.desafioModel
       .findOne({ _id: idDesafio })
       .exec();
@@ -160,7 +161,9 @@ export class DesafiosService {
       .exec();
 
     if (!jogadorFazParteDesafio) {
-      throw new BadRequestException('Jogador não faz parte do desafio!');
+      throw new BadRequestException(
+        'O Jogador vencedor não faz parte do desafio!',
+      );
     }
 
     const novaPartida = {
@@ -173,11 +176,20 @@ export class DesafiosService {
 
     await partidaCriada.save();
 
-    return await this.desafioModel.findOneAndUpdate(
-      { _id: idDesafio },
-      {
-        $set: { status: IDesafioStatusEnum.REALIZADO, partida: partidaCriada },
-      },
-    );
+    try {
+      await this.desafioModel.findOneAndUpdate(
+        { _id: idDesafio },
+        {
+          $set: {
+            status: IDesafioStatusEnum.REALIZADO,
+            partida: partidaCriada,
+          },
+        },
+      );
+    } catch (error) {
+      await this.partidaModel.deleteOne({ _id: partidaCriada._id }).exec();
+
+      throw new InternalServerErrorException();
+    }
   }
 }

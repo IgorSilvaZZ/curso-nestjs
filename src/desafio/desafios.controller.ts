@@ -62,8 +62,8 @@ export class DesafiosController {
   async atribuirPartidaDesafio(
     @Body() atribuirDesafioPartidaDTO: AtribuirDesafioPartidaDTO,
     @Param('idDesafio') idDesafio: string,
-  ): Promise<IDesafio | null> {
-    return await this.desafiosService.atribuirDesafioPartida(
+  ): Promise<void> {
+    await this.desafiosService.atribuirDesafioPartida(
       idDesafio,
       atribuirDesafioPartidaDTO,
     );
