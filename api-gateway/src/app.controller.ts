@@ -1,11 +1,21 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Logger, UsePipes, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Logger,
+  UsePipes,
+  Body,
+  Query,
+  Get,
+} from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common/pipes';
+import { Observable } from 'rxjs';
 
 import { ClientProxy } from '@nestjs/microservices';
 import { ClientProxyFactory } from '@nestjs/microservices/client';
 import { Transport } from '@nestjs/microservices/enums';
+
 import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
 
 @Controller('api/v1/categorias')
@@ -27,10 +37,12 @@ export class AppController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async criarCategoria(@Body() criarCategoriaDTO: CriaCategoriaDTO) {
-    return await this.clientAdminBackend.emit(
-      'criar-categoria',
-      criarCategoriaDTO,
-    );
+  criarCategoria(@Body() criarCategoriaDTO: CriaCategoriaDTO) {
+    this.clientAdminBackend.emit('criar-categoria', criarCategoriaDTO);
+  }
+
+  @Get()
+  consultarCategorias(@Query('idCategoria') _id: string): Observable<any> {
+    return this.clientAdminBackend.send('consultar-categorias', _id ? _id : '');
   }
 }
