@@ -3,10 +3,14 @@ import moment from 'moment-timezone';
 
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
+import { LogginInterceptor } from './interceptors/loggin.interceptor';
+import { TimeoutInterceptor } from './interceptors/timeout.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.useGlobalInterceptors(new LogginInterceptor());
+  app.useGlobalInterceptors(new TimeoutInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
 
   Date.prototype.toJSON = (): any => {
