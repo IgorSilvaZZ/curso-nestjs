@@ -1,25 +1,24 @@
-import { Controller } from '@nestjs/common';
-import { Logger } from '@nestjs/common/services';
+/* eslint-disable prettier/prettier */
+
+import { Controller, Logger } from '@nestjs/common';
 import {
-  Payload,
+  Ctx,
   EventPattern,
   MessagePattern,
-  Ctx,
+  Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { ICategoria } from '../interfaces/categorias/categoria.interface';
 
-import { Categoria } from './interfaces/categorias/categoria. schema';
-import { ICategoria } from './interfaces/categorias/categoria.interface';
-
-import { AppService } from './app.service';
+import { CategoriasService } from './categorias.service';
 
 const ackErros: string[] = ['E11000'];
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+export class CategoriasController {
+  constructor(private readonly categoriasService: CategoriasService) {}
 
-  logger = new Logger(AppController.name);
+  logger = new Logger(CategoriasController.name);
 
   // Se registrando no topico criar categoria, assim escutando toda emissao de o emissor nesse evento no message broker
   @EventPattern('criar-categoria')
@@ -33,7 +32,7 @@ export class AppController {
     this.logger.log(`categoria: ${JSON.stringify(categoria)}`);
 
     try {
-      await this.appService.criarCategoria(categoria);
+      await this.categoriasService.criarCategoria(categoria);
       await channel.ack(originalMessage);
     } catch (error) {
       this.logger.error(`erro: ${JSON.stringify(error.message)}`);
@@ -58,9 +57,9 @@ export class AppController {
 
     try {
       if (_id) {
-        return await this.appService.consultarCategoriaPeloId(_id);
+        return await this.categoriasService.consultarCategoriaPeloId(_id);
       } else {
-        return await this.appService.consultarCategorias();
+        return await this.categoriasService.consultarCategorias();
       }
     } finally {
       await channel.ack(originalMessage);
@@ -80,7 +79,7 @@ export class AppController {
       // this.logger.log(`id: ${JSON.stringify(_id)}`);
       // this.logger.log(`categoria: ${JSON.stringify(categoria)}`);
 
-      await this.appService.atualizarCategoria(_id, categoria);
+      await this.categoriasService.atualizarCategoria(_id, categoria);
 
       await channel.ack(originalMessage);
     } catch (error) {

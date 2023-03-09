@@ -1,23 +1,24 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
+import { Logger } from '@nestjs/common/services';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
-import { Logger } from '@nestjs/common/services';
 import { Model } from 'mongoose';
 
-import { ICategoria } from './interfaces/categorias/categoria.interface';
-import { IJogador } from './interfaces/jogadores/jogador.interface';
+import { ICategoria } from '../interfaces/categorias/categoria.interface';
+import { IJogador } from '../interfaces/jogadores/jogador.interface';
 
 @Injectable()
-export class AppService {
+export class CategoriasService {
   constructor(
     @InjectModel('jogador') private readonly jogadorModel: Model<IJogador>,
     @InjectModel('categoria')
     private readonly categoriaModel: Model<ICategoria>,
   ) {}
 
-  logger = new Logger(AppService.name);
+  logger = new Logger(CategoriasService.name);
 
   async criarCategoria(categoria: ICategoria): Promise<ICategoria> {
     try {
