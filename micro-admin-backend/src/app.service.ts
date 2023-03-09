@@ -3,6 +3,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
+import { Logger } from '@nestjs/common/services';
 import { Model } from 'mongoose';
 
 import { ICategoria } from './interfaces/categorias/categoria.interface';
@@ -16,6 +17,8 @@ export class AppService {
     private readonly categoriaModel: Model<ICategoria>,
   ) {}
 
+  logger = new Logger(AppService.name);
+
   async criarCategoria(categoria: ICategoria): Promise<ICategoria> {
     try {
       const categoriaCriada = new this.categoriaModel(categoria);
@@ -28,9 +31,9 @@ export class AppService {
 
   async consultarCategorias(): Promise<ICategoria[]> {
     return await this.categoriaModel
-    .find()
-    .populate([{ path: 'jogadores', model: 'jogador' }])
-    .exec();
+      .find()
+      .populate([{ path: 'jogadores', model: 'jogador' }])
+      .exec();
   }
 
   async consultarCategoriaPeloId(categoria: string): Promise<ICategoria> {
@@ -45,4 +48,20 @@ export class AppService {
     return categoriaEncontrada;
   }
 
+  async atualizarCategoria(
+    _id: string,
+    atualizarCategoriaDTO: ICategoria,
+  ): Promise<void> {
+    const categoriaEncontrada = await this.categoriaModel
+      .findOne({ _id })
+      .exec();
+
+    if (!categoriaEncontrada) {
+      throw new NotFoundException('Categoria não encontrada!');
+    }
+
+    await this.categoriaModel
+      .findOneAndUpdate({ _id }, { $set: atualizarCategoriaDTO })
+      .exec();
+  }
 }

@@ -15,10 +15,8 @@ export class LogginInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<any> | Promise<Observable<any>> {
-    console.log('Antes...');
-
     const now = Date.now();
 
-    return next.handle().pipe(tap(() => console.log(`Depois... ${now}`)));
+    return next.handle().pipe(tap());
   }
 }
