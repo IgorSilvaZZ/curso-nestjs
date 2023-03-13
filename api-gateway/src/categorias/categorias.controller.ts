@@ -1,42 +1,30 @@
 /* eslint-disable prettier/prettier */
 
 import {
-  Controller,
-  Post,
-  Logger,
-  UsePipes,
   Body,
-  Query,
+  Controller,
   Get,
-  Put,
+  Logger,
   Param,
+  Post,
+  Put,
+  Delete,
+  Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import { ValidationPipe } from '@nestjs/common/pipes';
 import { Observable } from 'rxjs';
+import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
+import { ClientProxyAdminBackend } from '../common/providers/ClientProxyAdminBackend.provider';
 
-import { ClientProxy } from '@nestjs/microservices';
-import { ClientProxyFactory } from '@nestjs/microservices/client';
-import { Transport } from '@nestjs/microservices/enums';
-
-import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
 import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
+import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
 
 @Controller('api/v1/categorias')
-export class AppController {
-  private logger = new Logger(AppController.name);
+export class CategoriasController {
+  constructor(private readonly clientAdminBackend: ClientProxyAdminBackend) {}
 
-  private clientAdminBackend: ClientProxy;
-
-  // Assim fazendo uma conexão com nosso message broker
-  constructor() {
-    this.clientAdminBackend = ClientProxyFactory.create({
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://localhost:5672/smartranking'],
-        queue: 'admin-backend',
-      },
-    });
-  }
+  private logger = new Logger(CategoriasController.name);
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -53,11 +41,16 @@ export class AppController {
   @UsePipes(ValidationPipe)
   atualizarCategoria(
     @Body() atualizarCategoriaDTO: AtualizarCategoriaDTO,
-    @Param('_id') _id: string,
+    @Param('_id', ValidacaoParametrosPipe) _id: string,
   ) {
     this.clientAdminBackend.emit('atualizar-categoria', {
       id: _id,
       categoria: atualizarCategoriaDTO,
     });
+  }
+
+  @Delete('/:_id')
+  deletarJogador(@Param('_id', ValidacaoParametrosPipe) _id: string) {
+    this.clientAdminBackend.emit('deletar-jogador', _id);
   }
 }

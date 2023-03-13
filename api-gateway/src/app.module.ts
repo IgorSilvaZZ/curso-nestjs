@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
+import { CategoriasModule } from './categorias/categorias.module';
+import { ClientProxyAdminBackend } from './common/providers/ClientProxyAdminBackend.provider';
+import { JogadoresModule } from './jogadores/jogadores.module';
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [],
+  controllers: [CategoriasModule, JogadoresModule],
+  providers: [ClientProxyAdminBackend],
+  exports: [ClientProxyAdminBackend],
 })
 export class AppModule {}

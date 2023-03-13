@@ -7,8 +7,8 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { ICategoria } from '../interfaces/categorias/categoria.interface';
-import { IJogador } from '../interfaces/jogadores/jogador.interface';
+import { ICategoria } from './interfaces/categoria.interface';
+import { IJogador } from 'src/jogadores/interfaces/jogador.interface';
 
 @Injectable()
 export class CategoriasService {

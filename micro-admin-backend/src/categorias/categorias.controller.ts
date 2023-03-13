@@ -8,7 +8,7 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { ICategoria } from '../interfaces/categorias/categoria.interface';
+import { ICategoria } from './interfaces/categoria.interface';
 
 import { CategoriasService } from './categorias.service';
 
