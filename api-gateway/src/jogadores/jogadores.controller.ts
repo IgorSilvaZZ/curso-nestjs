@@ -11,8 +11,12 @@ import {
   Param,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Query, UsePipes } from '@nestjs/common/decorators';
-import { ClientProxyAdminBackend } from 'src/common/providers/ClientProxyAdminBackend.provider';
+import { Delete, Query, UsePipes } from '@nestjs/common/decorators';
+
+import { ClientProxyAdminBackend } from '../common/providers/ClientProxyAdminBackend.provider';
+
+import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
+
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
 
@@ -25,23 +29,44 @@ export class JogadoresController {
   @Post()
   @UsePipes(ValidationPipe)
   criarJogador(@Body() criarJogadorDTO: CriarJogadorDTO) {
-    this.clientAdminBackend.emit('criar-jogador', criarJogadorDTO);
+    const jogador = {
+      nome: criarJogadorDTO.nome,
+      email: criarJogadorDTO.email,
+      telefoneCelular: criarJogadorDTO.telefoneCelular,
+    };
+
+    this.clientAdminBackend.emit('criar-jogador', {
+      idCategoria: criarJogadorDTO.idCategoria,
+      jogador,
+    });
   }
 
   @Get()
-  consultarJogadores(@Query('idCategoria') _id: string): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogadores', _id ? _id : '');
+  consultarJogadores(): Observable<any> {
+    return this.clientAdminBackend.send('consultar-jogadores', '');
+  }
+
+  @Get()
+  consultarJogador(
+    @Query('idJogador', ValidacaoParametrosPipe) _id: string,
+  ): Observable<any> {
+    return this.clientAdminBackend.send('consultar-jogador', _id);
   }
 
   @Put('/:_id')
   @UsePipes(ValidationPipe)
   atualizarJogador(
     @Body() atualizarJogadorDTO: AtualizarJogadorDTO,
-    @Param('_id') _id: string,
+    @Param('_id', ValidacaoParametrosPipe) _id: string,
   ) {
     this.clientAdminBackend.emit('atualizar-jogador', {
       id: _id,
       jogador: atualizarJogadorDTO,
     });
+  }
+
+  @Delete('/:_id')
+  async deletarJogador(@Param('_id', ValidacaoParametrosPipe) _id: string) {
+    this.clientAdminBackend.emit('deletar-jogador', _id);
   }
 }

@@ -3,8 +3,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
-import { IJogador } from '../../interfaces/jogadores/jogador.interface';
-import { Jogador } from '../../interfaces/jogadores/jogador.schema';
+import { IJogador } from '../../jogadores/interfaces/jogador.interface';
+import { Jogador } from '../../jogadores/interfaces/jogador.schema';
+
 import { IEvento } from './categoria.interface';
 
 @Schema({ timestamps: true, collection: 'categorias' })

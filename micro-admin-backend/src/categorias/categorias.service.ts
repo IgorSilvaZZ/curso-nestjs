@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 
 import { Injectable } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common/exceptions';
 import { Logger } from '@nestjs/common/services';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
@@ -43,7 +42,7 @@ export class CategoriasService {
     });
 
     if (!categoriaEncontrada) {
-      throw new NotFoundException('Categoria não encontrada!');
+      throw new RpcException('Categoria não encontrada!');
     }
 
     return categoriaEncontrada;
@@ -58,7 +57,7 @@ export class CategoriasService {
       .exec();
 
     if (!categoriaEncontrada) {
-      throw new NotFoundException('Categoria não encontrada!');
+      throw new RpcException('Categoria não encontrada!');
     }
 
     await this.categoriaModel

@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -23,9 +20,7 @@ export class JogadoresService {
     const jogadorEncontrado = await this.encontrarJogadorPorEmail(email);
 
     if (jogadorEncontrado) {
-      throw new BadRequestException(
-        `Jogador com email ${email} já cadastrado!`,
-      );
+      throw new RpcException(`Jogador com email ${email} já cadastrado!`);
     }
 
     const jogador = new this.jogadorModel(criarJogadorDTO);
@@ -40,7 +35,7 @@ export class JogadoresService {
     const jogadorEncontrado = await this.consultarJogadorPeloId(_id);
 
     if (!jogadorEncontrado) {
-      throw new BadRequestException(`Jogador com id: ${_id} não encontrado!`);
+      throw new RpcException(`Jogador com id: ${_id} não encontrado!`);
     }
 
     await this.jogadorModel
@@ -56,7 +51,7 @@ export class JogadoresService {
     const jogadorEncontrado = await this.encontrarJogadorPorEmail(email);
 
     if (!jogadorEncontrado) {
-      throw new NotFoundException(
+      throw new RpcException(
         `Jogador não encontrado com email ${email} não encontrado!`,
       );
     }
@@ -68,7 +63,7 @@ export class JogadoresService {
     const jogadorEncontrado = await this.encontrarJogadorPorId(_id);
 
     if (!jogadorEncontrado) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
+      throw new RpcException(`Jogador com id ${_id} não encontrado`);
     }
 
     return jogadorEncontrado;
@@ -78,7 +73,7 @@ export class JogadoresService {
     const jogadorEncontrado = await this.encontrarJogadorPorId(_id);
 
     if (!jogadorEncontrado) {
-      throw new NotFoundException(
+      throw new RpcException(
         `Jogador não encontrado com email ${_id} não encontrado!`,
       );
     }
