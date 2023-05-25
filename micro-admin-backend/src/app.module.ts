@@ -3,23 +3,18 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { JogadoresSchema } from './interfaces/jogadores/jogador.schema';
-import { CategoriasSchema } from './interfaces/categorias/categoria. schema';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CategoriasModule } from './categorias/categorias.module';
+import { JogadoresModule } from './jogadores/jogadores.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(
       'mongodb://admin:senha@localhost:27017/sradmbackend?authMechanism=DEFAULT&authSource=admin&directConnection=true',
     ),
-    MongooseModule.forFeature([{ name: 'jogador', schema: JogadoresSchema }]),
-    MongooseModule.forFeature([
-      { name: 'categoria', schema: CategoriasSchema },
-    ]),
+    CategoriasModule,
+    JogadoresModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
