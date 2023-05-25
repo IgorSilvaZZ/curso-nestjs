@@ -15,16 +15,21 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
-import { ClientProxyAdminBackend } from '../common/providers/ClientProxyAdminBackend.provider';
 
 import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
 import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
+import { ClientProxySmartRanking } from 'src/proxymq/client-proxy';
 
 @Controller('api/v1/categorias')
 export class CategoriasController {
-  constructor(private readonly clientAdminBackend: ClientProxyAdminBackend) {}
+  constructor(
+    private readonly clientProxySmartRaking: ClientProxySmartRanking,
+  ) {}
 
   private logger = new Logger(CategoriasController.name);
+
+  private clientAdminBackend =
+    this.clientProxySmartRaking.getClientProxyInstance();
 
   @Post()
   @UsePipes(ValidationPipe)

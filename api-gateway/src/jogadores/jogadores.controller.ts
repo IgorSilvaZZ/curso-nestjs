@@ -9,11 +9,12 @@ import {
   Get,
   Put,
   Param,
+  BadRequestException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Delete, Query, UsePipes } from '@nestjs/common/decorators';
 
-import { ClientProxyAdminBackend } from '../common/providers/ClientProxyAdminBackend.provider';
+import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
 import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
 
@@ -22,23 +23,39 @@ import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
-  constructor(private readonly clientAdminBackend: ClientProxyAdminBackend) {}
+  constructor(
+    private readonly clientProxySmartRaking: ClientProxySmartRanking,
+  ) {}
 
   private logger = new Logger(JogadoresController.name);
 
+  private clientAdminBackend =
+    this.clientProxySmartRaking.getClientProxyInstance();
+
   @Post()
   @UsePipes(ValidationPipe)
-  criarJogador(@Body() criarJogadorDTO: CriarJogadorDTO) {
+  async criarJogador(@Body() criarJogadorDTO: CriarJogadorDTO) {
     const jogador = {
       nome: criarJogadorDTO.nome,
       email: criarJogadorDTO.email,
       telefoneCelular: criarJogadorDTO.telefoneCelular,
     };
 
-    this.clientAdminBackend.emit('criar-jogador', {
-      idCategoria: criarJogadorDTO.idCategoria,
-      jogador,
-    });
+    const idCategoria = criarJogadorDTO.idCategoria;
+
+    const categoria = await this.clientAdminBackend.send(
+      'consultar-categorias',
+      idCategoria,
+    );
+
+    if (categoria) {
+      await this.clientAdminBackend.emit('criar-jogador', {
+        idCategoria,
+        jogador,
+      });
+    } else {
+      throw new BadRequestException('Categoria não cadastrada!');
+    }
   }
 
   @Get()

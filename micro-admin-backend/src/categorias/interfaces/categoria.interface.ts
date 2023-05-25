@@ -2,7 +2,7 @@
 
 import { Document } from 'mongoose';
 
-import { IJogador } from '../../interfaces/jogadores/jogador.interface';
+import { IJogador } from '../../jogadores/interfaces/jogador.interface';
 
 export interface ICategoria extends Document {
   readonly categoria: string;

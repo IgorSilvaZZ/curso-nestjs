@@ -12,7 +12,6 @@ import { IJogador } from 'src/jogadores/interfaces/jogador.interface';
 @Injectable()
 export class CategoriasService {
   constructor(
-    @InjectModel('jogador') private readonly jogadorModel: Model<IJogador>,
     @InjectModel('categoria')
     private readonly categoriaModel: Model<ICategoria>,
   ) {}
