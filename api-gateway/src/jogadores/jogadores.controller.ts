@@ -12,7 +12,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Delete, Query, UsePipes } from '@nestjs/common/decorators';
+import {
+  Delete,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+} from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
@@ -56,6 +63,19 @@ export class JogadoresController {
     } else {
       throw new BadRequestException('Categoria não cadastrada!');
     }
+  }
+
+  @Post('/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadArquivo(@UploadedFile() file, @Param('id') id: string) {
+    this.logger.log(id);
+    this.logger.log(file);
+
+    // Verificar se o jogador esta cadastrado
+    // Enviar o arquivo para S3
+    // Recuperar a URL de acesso
+    // Atualizar o atributo URL da entidade de jogador
+    // Retornar o jogador atualizado para o cliente
   }
 
   @Get()
