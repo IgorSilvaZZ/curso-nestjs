@@ -27,11 +27,13 @@ import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.p
 
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
+import { AwsService } from '../aws/aws.service';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
   constructor(
     private readonly clientProxySmartRaking: ClientProxySmartRanking,
+    private readonly awsService: AwsService,
   ) {}
 
   private logger = new Logger(JogadoresController.name);
@@ -72,9 +74,16 @@ export class JogadoresController {
     this.logger.log(file);
 
     // Verificar se o jogador esta cadastrado
+
     // Enviar o arquivo para S3
+    const data = await this.awsService.uploadArquivo(file, id);
+
+    return data;
+
     // Recuperar a URL de acesso
+
     // Atualizar o atributo URL da entidade de jogador
+
     // Retornar o jogador atualizado para o cliente
   }
 
