@@ -1,23 +1,19 @@
 /* eslint-disable prettier/prettier */
 
 import { Injectable, Logger } from '@nestjs/common';
-import * as AWS from 'aws-sdk';
+import { InjectAwsService } from 'nest-aws-sdk';
+
+import { S3 } from 'aws-sdk';
 @Injectable()
 export class AwsService {
   private logger = new Logger(AwsService.name);
 
-  public async uploadArquivo(file: any, id: string) {
-    const s3Instance = new AWS.S3({
-      endpoint: 'http://localhost:4000',
-      accessKeyId: 'S3RVER',
-      secretAccessKey: 'S3RVER',
-    });
+  constructor(@InjectAwsService(S3) private readonly s3: S3) {}
 
+  public async uploadArquivo(file: any, id: string) {
     const [, fileExtension] = file.originalname.split('.');
 
     const urlKey = `${id}.${fileExtension}`;
-
-    this.logger.log(`urlKey: ${urlKey}`);
 
     const params = {
       Body: file.buffer,
@@ -25,10 +21,9 @@ export class AwsService {
       Key: urlKey,
     };
 
-    const data = s3Instance
-      .putObject(params)
-      .promise()
-      .then((data) => data);
+    const data = await this.s3.putObject(params).promise();
+
+    // const data = await this.s3.listBuckets().promise();
 
     return data;
   }

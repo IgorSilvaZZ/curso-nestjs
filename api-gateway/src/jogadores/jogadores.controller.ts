@@ -70,8 +70,7 @@ export class JogadoresController {
   @Post('/:id/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadArquivo(@UploadedFile() file, @Param('id') id: string) {
-    this.logger.log(id);
-    this.logger.log(file);
+    this.logger.log(`file ${file}`);
 
     // Verificar se o jogador esta cadastrado
 
