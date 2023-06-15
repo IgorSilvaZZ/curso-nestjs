@@ -3,17 +3,21 @@
 import { Module } from '@nestjs/common';
 import { AwsSdkModule } from 'nest-aws-sdk';
 import { S3, Endpoint } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 import { AwsService } from './aws.service';
 
 @Module({
   imports: [
-    AwsSdkModule.forRoot({
+    AwsSdkModule.forRootAsync({
       defaultServiceOptions: {
-        s3ForcePathStyle: true, // Parametro que força urls de estilo caminho para objetos do S3
-        endpoint: new Endpoint('http://localhost:4000'),
-        accessKeyId: 'S3RVER',
-        secretAccessKey: 'S3RVER',
+        useFactory: (configService: ConfigService) => ({
+          s3ForcePathStyle: true,
+          endpoint: new Endpoint(configService.get('AWS_S3_URL_ENDPOINT')),
+          accessKeyId: configService.get('AWS_SECRET_KEY_ID'),
+          secretAccessKey: configService.get('AWS_SECRET_ACCESS_KEY'),
+        }),
+        inject: [ConfigService],
       },
       services: [S3],
     }),

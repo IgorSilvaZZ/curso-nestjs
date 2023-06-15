@@ -57,7 +57,7 @@ export class JogadoresController {
       idCategoria,
     );
 
-    if (categoria) {
+    if (Object.values(categoria).length > 0) {
       await this.clientAdminBackend.emit('criar-jogador', {
         idCategoria,
         jogador,
@@ -73,17 +73,33 @@ export class JogadoresController {
     this.logger.log(`file ${file}`);
 
     // Verificar se o jogador esta cadastrado
+    const jogadorExiste = await this.clientAdminBackend.send(
+      'consultar-jogador',
+      id,
+    );
+
+    if (!jogadorExiste) {
+      throw new BadRequestException(`Jogador não encontrado!`);
+    }
 
     // Enviar o arquivo para S3
-    const data = await this.awsService.uploadArquivo(file, id);
-
-    return data;
-
     // Recuperar a URL de acesso
+    const { url: urlFotoJogador } = await this.awsService.uploadArquivo(
+      file,
+      id,
+    );
 
     // Atualizar o atributo URL da entidade de jogador
+    const atualizarJogadorDTO: AtualizarJogadorDTO = {};
+    atualizarJogadorDTO.urlFotoJogador = urlFotoJogador;
+
+    await this.clientAdminBackend.emit('atualizar-jogador', {
+      id,
+      jogador: atualizarJogadorDTO,
+    });
 
     // Retornar o jogador atualizado para o cliente
+    return this.clientAdminBackend.send('consultar-jogador', id);
   }
 
   @Get()
