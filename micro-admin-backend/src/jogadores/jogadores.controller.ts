@@ -76,9 +76,11 @@ export class JogadoresController {
 
       const jogador: IJogador = criarJogador.jogador;
 
-      await this.jogadoresService.criarJogador(jogador);
+      const novoJogador = await this.jogadoresService.criarJogador(jogador);
 
       await channel.ack(originalMessage);
+
+      return novoJogador;
     } catch (error) {
       this.logger.log(`Erro ao criar jogador!!`);
       this.logger.log(error.message);
@@ -100,9 +102,14 @@ export class JogadoresController {
 
       const jogador: IJogador = atualizarJogador.jogador;
 
-      await this.jogadoresService.atualizarJogador(id, jogador);
+      const jogadorAtualizado = await this.jogadoresService.atualizarJogador(
+        id,
+        jogador,
+      );
 
       await channel.ack(originalMessage);
+
+      return jogadorAtualizado;
     } catch (error) {
       this.logger.log(`Erro ao atualizar jogador!!`);
       this.logger.log(error.message);

@@ -12,7 +12,14 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Delete, Query, UsePipes } from '@nestjs/common/decorators';
+import {
+  Delete,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+} from '@nestjs/common/decorators';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
@@ -20,11 +27,13 @@ import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.p
 
 import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
+import { AwsService } from '../aws/aws.service';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
   constructor(
     private readonly clientProxySmartRaking: ClientProxySmartRanking,
+    private readonly awsService: AwsService,
   ) {}
 
   private logger = new Logger(JogadoresController.name);
@@ -48,7 +57,7 @@ export class JogadoresController {
       idCategoria,
     );
 
-    if (categoria) {
+    if (Object.values(categoria).length > 0) {
       await this.clientAdminBackend.emit('criar-jogador', {
         idCategoria,
         jogador,
@@ -56,6 +65,41 @@ export class JogadoresController {
     } else {
       throw new BadRequestException('Categoria não cadastrada!');
     }
+  }
+
+  @Post('/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadArquivo(@UploadedFile() file, @Param('id') id: string) {
+    this.logger.log(`file ${file}`);
+
+    // Verificar se o jogador esta cadastrado
+    const jogadorExiste = await this.clientAdminBackend.send(
+      'consultar-jogador',
+      id,
+    );
+
+    if (!jogadorExiste) {
+      throw new BadRequestException(`Jogador não encontrado!`);
+    }
+
+    // Enviar o arquivo para S3
+    // Recuperar a URL de acesso
+    const { url: urlFotoJogador } = await this.awsService.uploadArquivo(
+      file,
+      id,
+    );
+
+    // Atualizar o atributo URL da entidade de jogador
+    const atualizarJogadorDTO: AtualizarJogadorDTO = {};
+    atualizarJogadorDTO.urlFotoJogador = urlFotoJogador;
+
+    await this.clientAdminBackend.emit('atualizar-jogador', {
+      id,
+      jogador: atualizarJogadorDTO,
+    });
+
+    // Retornar o jogador atualizado para o cliente
+    return this.clientAdminBackend.send('consultar-jogador', id);
   }
 
   @Get()

@@ -32,8 +32,13 @@ export class CategoriasController {
     // this.logger.log(`categoria: ${JSON.stringify(categoria)}`);
 
     try {
-      await this.categoriasService.criarCategoria(categoria);
+      const novaCategoria = await this.categoriasService.criarCategoria(
+        categoria,
+      );
+
       await channel.ack(originalMessage);
+
+      return novaCategoria;
     } catch (error) {
       this.logger.error(`erro: ${JSON.stringify(error.message)}`);
 
@@ -79,9 +84,12 @@ export class CategoriasController {
       // this.logger.log(`id: ${JSON.stringify(_id)}`);
       // this.logger.log(`categoria: ${JSON.stringify(categoria)}`);
 
-      await this.categoriasService.atualizarCategoria(_id, categoria);
+      const categoriaAtualizada =
+        await this.categoriasService.atualizarCategoria(_id, categoria);
 
       await channel.ack(originalMessage);
+
+      return categoriaAtualizada;
     } catch (error) {
       this.logger.log(`Error: ${error.message}`);
 

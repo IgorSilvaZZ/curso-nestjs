@@ -1,11 +1,14 @@
 /* eslint-disable prettier/prettier */
 
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class AtualizarJogadorDTO {
-  @IsNotEmpty()
+  /* @IsNotEmpty()
   readonly nome: string;
 
   @IsNotEmpty()
-  readonly telefoneCelular: string;
+  readonly telefoneCelular: string; */
+
+  @IsOptional()
+  urlFotoJogador?: string;
 }

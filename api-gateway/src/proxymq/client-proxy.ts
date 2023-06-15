@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ClientProxy,
   ClientProxyFactory,
@@ -9,11 +10,15 @@ import {
 
 @Injectable()
 export class ClientProxySmartRanking {
+  constructor(private readonly configService: ConfigService) {}
+
   getClientProxyInstance(): ClientProxy {
+    const RABBITMQ_URL = this.configService.get<string>('RABBITMQ_URL');
+
     return ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://localhost:5672/smartranking'],
+        urls: [RABBITMQ_URL],
         queue: 'admin-backend',
       },
     });
