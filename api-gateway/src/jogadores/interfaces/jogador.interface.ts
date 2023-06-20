@@ -1,8 +1,5 @@
 /* eslint-disable prettier/prettier */
-
-import { Document } from 'mongoose';
-
-export interface IJogador extends Document {
+export interface IJogador {
   readonly _id: string;
   readonly telefoneCelular: string;
   readonly email: string;

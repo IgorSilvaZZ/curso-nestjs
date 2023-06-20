@@ -5,6 +5,9 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 @Schema({ timestamps: true, collection: 'jogadores' })
 export class Jogador {
   @Prop()
+  _id: string;
+
+  @Prop()
   nome: string;
 
   @Prop({ unique: true })
@@ -12,6 +15,9 @@ export class Jogador {
 
   @Prop()
   telefoneCelular: string;
+
+  @Prop()
+  categoria: string;
 
   @Prop()
   ranking: string;

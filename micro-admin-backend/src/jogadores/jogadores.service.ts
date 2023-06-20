@@ -44,7 +44,11 @@ export class JogadoresService {
   }
 
   async consultarTodosJogadores(): Promise<IJogador[]> {
-    return await this.jogadorModel.find().exec();
+    try {
+      return await this.jogadorModel.find().select('_id').exec();
+    } catch (error) {
+      throw new RpcException(error.message);
+    }
   }
 
   async consultarJogadoresPeloEmail(email: string): Promise<IJogador> {
