@@ -4,8 +4,8 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true, collection: 'jogadores' })
 export class Jogador {
-  @Prop()
-  _id: string;
+  /* @Prop({ _id: false })
+  _id: string; */
 
   @Prop()
   nome: string;

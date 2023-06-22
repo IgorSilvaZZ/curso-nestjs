@@ -33,21 +33,29 @@ export class DesafiosController {
   @UsePipes(ValidationPipe)
   async criarDesafio(@Body() criarDesafioDTO: CriarDesafioDTO) {
     // Verificar se os jogadores estao cadastrados
-    const jogadoresCadastrados: IJogador[] = await this.clientAdminBackend.send(
+    const jogadoresCadastrados = this.clientAdminBackend.send(
       'consultar-jogadores',
       '',
     );
 
-    const jogadoresNaoCadastrados = jogadoresCadastrados.filter(
-      (jogadorCadastrado) =>
-        !criarDesafioDTO.jogadores.some(
-          (jogador) => jogador._id === jogadorCadastrado._id,
-        ),
-    );
+    // this.logger.log(JSON.stringify(jogadoresCadastrados));
 
-    if (jogadoresNaoCadastrados.length > 0) {
+    if (Array.isArray(jogadoresCadastrados)) {
+      const jogadoresNaoCadastrados = jogadoresCadastrados.filter(
+        (jogadorCadastrado) =>
+          !criarDesafioDTO.jogadores.some(
+            (jogador) => jogador._id === jogadorCadastrado._id,
+          ),
+      );
+
+      if (jogadoresNaoCadastrados.length > 0) {
+        throw new BadRequestException(
+          `Jogadore(s) ${jogadoresNaoCadastrados.join(',')} não cadastrados!`,
+        );
+      }
+    } else {
       throw new BadRequestException(
-        `Jogadore(s) ${jogadoresNaoCadastrados.join(',')} não cadastrados!`,
+        'Erro ao verificar se os jogadores estão cadastrados!',
       );
     }
 

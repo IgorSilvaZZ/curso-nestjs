@@ -12,9 +12,9 @@ import { DesafiosModule } from './desafios/desafios.module';
   imports: [
     JogadoresModule,
     CategoriasModule,
+    DesafiosModule,
     AwsModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    DesafiosModule,
   ],
   controllers: [],
 })

@@ -41,12 +41,13 @@ export class JogadoresController {
   logger = new Logger(JogadoresController.name);
 
   @MessagePattern('consultar-jogadores')
-  async consultarJogadores(_, @Ctx() context: RmqContext) {
+  async consultarJogadores(_, @Ctx() context: RmqContext): Promise<IJogador[]> {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
 
     try {
-      return this.jogadoresService.consultarTodosJogadores();
+      this.logger.log('CHAMOU consultar-jogadores');
+      return await this.jogadoresService.consultarTodosJogadores();
     } finally {
       await channel.ack(originalMessage);
     }
@@ -58,7 +59,7 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      return this.jogadoresService.consultarJogadorPeloId(id);
+      return await this.jogadoresService.consultarJogadorPeloId(id);
     } finally {
       await channel.ack(originalMessage);
     }

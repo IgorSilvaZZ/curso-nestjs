@@ -107,11 +107,12 @@ export class JogadoresController {
     return this.clientAdminBackend.send('consultar-jogadores', '');
   }
 
-  @Get()
+  @Get('/:id')
+  @UsePipes(ValidationPipe)
   consultarJogador(
-    @Query('idJogador', ValidacaoParametrosPipe) _id: string,
+    @Param('id', ValidacaoParametrosPipe) id: string,
   ): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogador', _id);
+    return this.clientAdminBackend.send('consultar-jogador', id);
   }
 
   @Put('/:_id')
