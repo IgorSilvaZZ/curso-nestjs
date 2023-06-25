@@ -11,5 +11,5 @@ export class CriarJogadorDTO {
 
   readonly telefoneCelular: string;
 
-  readonly idCategoria: string;
+  readonly categoria: string;
 }

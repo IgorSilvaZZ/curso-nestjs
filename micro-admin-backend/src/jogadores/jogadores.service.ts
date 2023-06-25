@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common/services';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -13,6 +14,8 @@ export class JogadoresService {
   constructor(
     @InjectModel('jogador') private readonly jogadorModel: Model<Jogador>,
   ) {}
+
+  logger = new Logger(JogadoresService.name);
 
   async criarJogador(criarJogadorDTO: IJogador): Promise<IJogador> {
     const { email } = criarJogadorDTO;

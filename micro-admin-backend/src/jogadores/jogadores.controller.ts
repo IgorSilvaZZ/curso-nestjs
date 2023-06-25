@@ -46,8 +46,8 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      this.logger.log('CHAMOU consultar-jogadores');
-      return await this.jogadoresService.consultarTodosJogadores();
+      const jogadores = await this.jogadoresService.consultarTodosJogadores();
+      return jogadores;
     } finally {
       await channel.ack(originalMessage);
     }
@@ -71,11 +71,14 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      const idCategoria: string = criarJogador.idCategoria;
+      const categoria: string = criarJogador.categoria;
 
-      await this.categoriaService.consultarCategoriaPeloId(idCategoria);
+      await this.categoriaService.consultarCategoriaPeloId(categoria);
 
-      const jogador: IJogador = criarJogador.jogador;
+      const jogador: IJogador = {
+        ...criarJogador.jogador,
+        categoria,
+      };
 
       const novoJogador = await this.jogadoresService.criarJogador(jogador);
 

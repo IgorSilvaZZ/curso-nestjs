@@ -13,7 +13,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
 
 import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
@@ -38,8 +38,10 @@ export class CategoriasController {
   }
 
   @Get()
-  consultarCategorias(@Query('idCategoria') _id: string): Observable<any> {
-    return this.clientAdminBackend.send('consultar-categorias', _id ? _id : '');
+  async consultarCategorias(@Query('idCategoria') _id: string) {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-categorias', _id ? _id : ''),
+    );
   }
 
   @Put('/:_id')

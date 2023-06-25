@@ -3,7 +3,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { CategoriasSchema } from './interfaces/categoria. schema';
+import { CategoriasSchema } from './interfaces/categoria.schema';
 
 import { CategoriasController } from './categorias.controller';
 import { CategoriasService } from './categorias.service';

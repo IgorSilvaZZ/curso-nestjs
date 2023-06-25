@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   BadRequestException,
 } from '@nestjs/common';
+import { lastValueFrom } from 'rxjs';
 
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
@@ -33,35 +34,31 @@ export class DesafiosController {
   @UsePipes(ValidationPipe)
   async criarDesafio(@Body() criarDesafioDTO: CriarDesafioDTO) {
     // Verificar se os jogadores estao cadastrados
-    const jogadoresCadastrados = this.clientAdminBackend.send(
-      'consultar-jogadores',
-      '',
+    const jogadoresCadastrados: IJogador[] = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogadores', ''),
     );
 
-    // this.logger.log(JSON.stringify(jogadoresCadastrados));
+    // this.logger.log(JSON.stringify(criarDesafioDTO.jogadores));
 
-    if (Array.isArray(jogadoresCadastrados)) {
-      const jogadoresNaoCadastrados = jogadoresCadastrados.filter(
-        (jogadorCadastrado) =>
-          !criarDesafioDTO.jogadores.some(
-            (jogador) => jogador._id === jogadorCadastrado._id,
-          ),
-      );
+    const jogadoresNaoCadastrados = criarDesafioDTO.jogadores.filter(
+      (jogadorCadastrado) =>
+        !jogadoresCadastrados.some(
+          (jogador) => jogador._id === jogadorCadastrado._id,
+        ),
+    );
 
-      if (jogadoresNaoCadastrados.length > 0) {
-        throw new BadRequestException(
-          `Jogadore(s) ${jogadoresNaoCadastrados.join(',')} não cadastrados!`,
-        );
-      }
-    } else {
+    if (jogadoresNaoCadastrados.length > 0) {
       throw new BadRequestException(
-        'Erro ao verificar se os jogadores estão cadastrados!',
+        `Jogadore(s) ${jogadoresNaoCadastrados
+          .map((item) => item._id)
+          .join(',')} não cadastrados!`,
       );
     }
 
-    return;
-
     // Verificar se os jogadores pertecem ao uma categoria
+    // const jogadoresCategoria = criarDesafioDTO.jogadores.map(jogador => lastValueFrom())
+
+    return;
 
     // Veriricar se o solicitante é um jogador da partida
 

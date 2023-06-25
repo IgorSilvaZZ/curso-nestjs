@@ -11,10 +11,9 @@ import {
   Param,
   BadRequestException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import {
   Delete,
-  Query,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -50,16 +49,15 @@ export class JogadoresController {
       telefoneCelular: criarJogadorDTO.telefoneCelular,
     };
 
-    const idCategoria = criarJogadorDTO.idCategoria;
+    const categoria = criarJogadorDTO.categoria;
 
-    const categoria = await this.clientAdminBackend.send(
-      'consultar-categorias',
-      idCategoria,
+    const categoriaExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-categorias', categoria),
     );
 
-    if (Object.values(categoria).length > 0) {
-      await this.clientAdminBackend.emit('criar-jogador', {
-        idCategoria,
+    if (Object.values(categoriaExistente).length > 0) {
+      this.clientAdminBackend.emit('criar-jogador', {
+        categoria,
         jogador,
       });
     } else {
@@ -73,9 +71,8 @@ export class JogadoresController {
     this.logger.log(`file ${file}`);
 
     // Verificar se o jogador esta cadastrado
-    const jogadorExiste = await this.clientAdminBackend.send(
-      'consultar-jogador',
-      id,
+    const jogadorExiste = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
     );
 
     if (!jogadorExiste) {
@@ -93,26 +90,30 @@ export class JogadoresController {
     const atualizarJogadorDTO: AtualizarJogadorDTO = {};
     atualizarJogadorDTO.urlFotoJogador = urlFotoJogador;
 
-    await this.clientAdminBackend.emit('atualizar-jogador', {
+    this.clientAdminBackend.emit('atualizar-jogador', {
       id,
       jogador: atualizarJogadorDTO,
     });
 
     // Retornar o jogador atualizado para o cliente
-    return this.clientAdminBackend.send('consultar-jogador', id);
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
+    );
   }
 
   @Get()
-  consultarJogadores(): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogadores', '');
+  async consultarJogadores() {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogadores', ''),
+    );
   }
 
   @Get('/:id')
   @UsePipes(ValidationPipe)
-  consultarJogador(
-    @Param('id', ValidacaoParametrosPipe) id: string,
-  ): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogador', id);
+  async consultarJogador(@Param('id', ValidacaoParametrosPipe) id: string) {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
+    );
   }
 
   @Put('/:_id')

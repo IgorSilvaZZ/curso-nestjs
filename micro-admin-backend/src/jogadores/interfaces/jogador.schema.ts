@@ -1,6 +1,9 @@
 /* eslint-disable prettier/prettier */
 
+import mongoose from 'mongoose';
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+
+import { Categoria } from '../../categorias/interfaces/categoria.schema';
 
 @Schema({ timestamps: true, collection: 'jogadores' })
 export class Jogador {
@@ -16,8 +19,8 @@ export class Jogador {
   @Prop()
   telefoneCelular: string;
 
-  @Prop()
-  categoria: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Categoria.name })
+  categoria: Categoria;
 
   @Prop()
   ranking: string;

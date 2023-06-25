@@ -1,10 +1,6 @@
 /* eslint-disable prettier/prettier */
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
-
-import { IJogador } from '../../jogadores/interfaces/jogador.interface';
-import { Jogador } from '../../jogadores/interfaces/jogador.schema';
 
 import { IEvento } from './categoria.interface';
 
@@ -18,9 +14,6 @@ export class Categoria {
 
   @Prop()
   eventos: IEvento[];
-
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: Jogador.name }] })
-  jogadores: IJogador[];
 }
 
 export const CategoriasSchema = SchemaFactory.createForClass(Categoria);

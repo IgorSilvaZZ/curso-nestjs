@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { ICategoria } from './interfaces/categoria.interface';
-import { IJogador } from 'src/jogadores/interfaces/jogador.interface';
 
 @Injectable()
 export class CategoriasService {
@@ -29,10 +28,7 @@ export class CategoriasService {
   }
 
   async consultarCategorias(): Promise<ICategoria[]> {
-    return await this.categoriaModel
-      .find()
-      .populate([{ path: 'jogadores', model: 'jogador' }])
-      .exec();
+    return await this.categoriaModel.find().exec();
   }
 
   async consultarCategoriaPeloId(categoria: string): Promise<ICategoria> {
