@@ -15,6 +15,9 @@ export class CriarDesafioDTO {
   dataHoraDesafio: Date;
 
   @IsNotEmpty()
+  categoria: string;
+
+  @IsNotEmpty()
   solicitante: string;
 
   @IsNotEmpty()

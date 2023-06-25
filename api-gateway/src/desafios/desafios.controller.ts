@@ -38,8 +38,6 @@ export class DesafiosController {
       this.clientAdminBackend.send('consultar-jogadores', ''),
     );
 
-    // this.logger.log(JSON.stringify(criarDesafioDTO.jogadores));
-
     const jogadoresNaoCadastrados = criarDesafioDTO.jogadores.filter(
       (jogadorCadastrado) =>
         !jogadoresCadastrados.some(
@@ -51,19 +49,44 @@ export class DesafiosController {
       throw new BadRequestException(
         `Jogadore(s) ${jogadoresNaoCadastrados
           .map((item) => item._id)
-          .join(',')} não cadastrados!`,
+          .join(', ')} não cadastrado(s)!`,
       );
     }
 
-    // Verificar se os jogadores pertecem ao uma categoria
-    // const jogadoresCategoria = criarDesafioDTO.jogadores.map(jogador => lastValueFrom())
-
-    return;
-
-    // Veriricar se o solicitante é um jogador da partida
-
     // Verificar se a categoria esta cadastrada
+    await lastValueFrom(
+      this.clientAdminBackend.send(
+        'consultar-categorias',
+        criarDesafioDTO.categoria,
+      ),
+    );
 
-    // this.clientChallenges.emit('criar-desafio', criarDesafioDTO);
+    // Verificando se o solicitante é um jogador da partida
+    const jogadorFazParteDesafio = criarDesafioDTO.jogadores.find(
+      (jogador) => jogador._id === criarDesafioDTO.solicitante,
+    );
+
+    if (!jogadorFazParteDesafio) {
+      throw new BadRequestException(
+        `O Solicitante com id ${criarDesafioDTO.solicitante}, não faz parte do desafio! Informe um ID solicitante que faça parte do desafio!`,
+      );
+    }
+
+    // Verificando se o jogador realmente pertence a categoria que foi informada
+    const jogadorCategoriaNaoCorrespondente = jogadoresCadastrados.filter(
+      (jogador) => jogador.categoria !== criarDesafioDTO.categoria,
+    );
+
+    if (jogadorCategoriaNaoCorrespondente.length > 0) {
+      throw new BadRequestException(
+        `Jogadore(s) ${jogadorCategoriaNaoCorrespondente
+          .map((item) => item.nome)
+          .join(', ')} não está com a categoria correspondente!`,
+      );
+    }
+
+    return await lastValueFrom(
+      this.clientChallenges.emit('criar-desafio', criarDesafioDTO),
+    );
   }
 }

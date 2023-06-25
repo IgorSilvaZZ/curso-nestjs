@@ -48,7 +48,10 @@ export class JogadoresService {
 
   async consultarTodosJogadores(): Promise<IJogador[]> {
     try {
-      return await this.jogadorModel.find().select('_id').exec();
+      return await this.jogadorModel
+        .find()
+        .select(['_id', 'nome', 'categoria'])
+        .exec();
     } catch (error) {
       throw new RpcException(error.message);
     }
