@@ -4,7 +4,9 @@ import {
   Body,
   Controller,
   Logger,
+  Get,
   Post,
+  Param,
   UsePipes,
   ValidationPipe,
   BadRequestException,
@@ -15,6 +17,7 @@ import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
 import { CriarDesafioDTO } from './dtos/criarDesafio.dto';
 import { IJogador } from '../jogadores/interfaces/jogador.interface';
+import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -29,6 +32,26 @@ export class DesafiosController {
 
   private clientChallenges =
     this.clientProxySmartRaking.getClientProxyInstanceChallenges();
+
+  @Get('/:id')
+  @UsePipes(ValidationPipe)
+  async consultarDesafiosJogador(
+    @Param('id', ValidacaoParametrosPipe) id: string,
+  ) {
+    const jogadorCadastrado = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
+    );
+
+    if (!jogadorCadastrado) {
+      throw new BadRequestException(`O Jogador com ${id} não está cadastrado!`);
+    }
+
+    const desafios = await lastValueFrom(
+      this.clientChallenges.send('consultar-desafios-jogador', id),
+    );
+
+    return desafios;
+  }
 
   @Post()
   @UsePipes(ValidationPipe)
