@@ -10,14 +10,19 @@ import {
   UsePipes,
   ValidationPipe,
   BadRequestException,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
+import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
 
 import { CriarDesafioDTO } from './dtos/criarDesafio.dto';
+import { AtualizarDesafioDTO } from './dtos/atualizarDesafio.dto';
 import { IJogador } from '../jogadores/interfaces/jogador.interface';
-import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
+import { IDesafio } from './interfaces/desafio.interface';
+import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -33,21 +38,23 @@ export class DesafiosController {
   private clientChallenges =
     this.clientProxySmartRaking.getClientProxyInstanceChallenges();
 
-  @Get('/:id')
+  @Get('/:idJogador')
   @UsePipes(ValidationPipe)
   async consultarDesafiosJogador(
-    @Param('id', ValidacaoParametrosPipe) id: string,
+    @Param('idJogador', ValidacaoParametrosPipe) idJogador: string,
   ) {
     const jogadorCadastrado = await lastValueFrom(
-      this.clientAdminBackend.send('consultar-jogador', id),
+      this.clientAdminBackend.send('consultar-jogador', idJogador),
     );
 
     if (!jogadorCadastrado) {
-      throw new BadRequestException(`O Jogador com ${id} não está cadastrado!`);
+      throw new BadRequestException(
+        `O Jogador com ${idJogador} não está cadastrado!`,
+      );
     }
 
     const desafios = await lastValueFrom(
-      this.clientChallenges.send('consultar-desafios-jogador', id),
+      this.clientChallenges.send('consultar-desafios-jogador', idJogador),
     );
 
     return desafios;
@@ -110,6 +117,60 @@ export class DesafiosController {
 
     return await lastValueFrom(
       this.clientChallenges.emit('criar-desafio', criarDesafioDTO),
+    );
+  }
+
+  @Put('/:idDesafio')
+  @UsePipes(ValidationPipe)
+  async atualizarDesafio(
+    @Param('idDesafio', ValidacaoParametrosPipe) idDesafio: string,
+    @Body() atualizarDesafioDTO: AtualizarDesafioDTO,
+  ) {
+    const desafioCadastrado: IDesafio = await lastValueFrom(
+      this.clientChallenges.send('consultar-categoria', idDesafio),
+    );
+
+    if (!desafioCadastrado) {
+      throw new BadRequestException(
+        `Desafio com id: ${idDesafio}, não esta cadastrado!`,
+      );
+    }
+
+    if (desafioCadastrado.status !== IDesafioStatusEnum.PENDENTE) {
+      throw new BadRequestException(
+        `O Desafio está com status invalido! Status Pendente apenas pode ser atualizado!!`,
+      );
+    }
+
+    const desafioAtualizar = {
+      ...atualizarDesafioDTO,
+      idDesafio,
+    };
+
+    const desafioAtualizado = await lastValueFrom(
+      this.clientChallenges.emit('atualizar-desafio', desafioAtualizar),
+    );
+
+    return desafioAtualizado;
+  }
+
+  @Delete('/:idDesafio')
+  @UsePipes(ValidationPipe)
+  async deletarDesafio(
+    @Param('idDesafio', ValidacaoParametrosPipe) idDesafio: string,
+  ) {
+    const desafioCadastrado = await lastValueFrom(
+      this.clientChallenges.send('consultar-categoria', idDesafio),
+    );
+
+    if (!desafioCadastrado) {
+      throw new BadRequestException(
+        `Desafio com id: ${idDesafio} não esta cadastrado!`,
+      );
+    }
+
+    await lastValueFrom(
+      this.clientChallenges.emit('deletar-desafio', idDesafio),
     );
   }
 }
