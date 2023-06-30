@@ -23,6 +23,7 @@ import { AtualizarDesafioDTO } from './dtos/atualizarDesafio.dto';
 import { IJogador } from '../jogadores/interfaces/jogador.interface';
 import { IDesafio } from './interfaces/desafio.interface';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
+import { AtribuirDesafioPartidaDTO } from './dtos/atribuirDesafioPartida.dto';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -53,11 +54,11 @@ export class DesafiosController {
       );
     }
 
-    const desafios = await lastValueFrom(
+    const desafiosJogador = await lastValueFrom(
       this.clientChallenges.send('consultar-desafios-jogador', idJogador),
     );
 
-    return desafios;
+    return desafiosJogador;
   }
 
   @Post()
@@ -120,6 +121,62 @@ export class DesafiosController {
     );
   }
 
+  @Post('/:idDesafio/partida')
+  @UsePipes(ValidationPipe)
+  async atribuirDesafioPartida(
+    @Param('idDesafio', ValidacaoParametrosPipe) idDesafio: string,
+    @Body() atribuirDesafioPartidaDTO: AtribuirDesafioPartidaDTO,
+  ) {
+    const desafioCadastrado: IDesafio = await lastValueFrom(
+      this.clientChallenges.send('consultar-desafio', idDesafio),
+    );
+
+    if (!desafioCadastrado) {
+      throw new BadRequestException(
+        `Desafio com id ${idDesafio}, não está cadastrado!`,
+      );
+    }
+
+    if (desafioCadastrado.status === IDesafioStatusEnum.REALIZADO) {
+      throw new BadRequestException(
+        `Desafio com status REALIZADO não pode ser atribuido a nenhuma partida!`,
+      );
+    }
+
+    if (desafioCadastrado.status !== IDesafioStatusEnum.ACEITO) {
+      throw new BadRequestException(
+        `Desafio informado contem status invalido!! Apenas desafios com status ACEITO podem ser atribuidos a uma partida!`,
+      );
+    }
+
+    // const desafiosCadastrados: IDesafio[] = await lastValueFrom(this.clientChallenges.send('consultar-desafios', ''));
+
+    const jogadorFazParteDesafio = await lastValueFrom(
+      this.clientChallenges.send(
+        'consultar-vencedor-desafio',
+        atribuirDesafioPartidaDTO.def,
+      ),
+    );
+
+    if (!jogadorFazParteDesafio) {
+      throw new BadRequestException(
+        `Jogador vencedor com id ${atribuirDesafioPartidaDTO.def}, não faz parte do desafio!`,
+      );
+    }
+
+    const novaPartida = {
+      categoria: desafioCadastrado.categoria,
+      def: atribuirDesafioPartidaDTO.def,
+      resultado: atribuirDesafioPartidaDTO.resultado,
+    };
+
+    const partidaCriada = await lastValueFrom(
+      this.clientChallenges.emit('criar-partida', novaPartida),
+    );
+
+    return partidaCriada;
+  }
+
   @Put('/:idDesafio')
   @UsePipes(ValidationPipe)
   async atualizarDesafio(
@@ -127,7 +184,7 @@ export class DesafiosController {
     @Body() atualizarDesafioDTO: AtualizarDesafioDTO,
   ) {
     const desafioCadastrado: IDesafio = await lastValueFrom(
-      this.clientChallenges.send('consultar-categoria', idDesafio),
+      this.clientChallenges.send('consultar-desafio', idDesafio),
     );
 
     if (!desafioCadastrado) {
@@ -160,7 +217,7 @@ export class DesafiosController {
     @Param('idDesafio', ValidacaoParametrosPipe) idDesafio: string,
   ) {
     const desafioCadastrado = await lastValueFrom(
-      this.clientChallenges.send('consultar-categoria', idDesafio),
+      this.clientChallenges.send('consultar-desafio', idDesafio),
     );
 
     if (!desafioCadastrado) {
