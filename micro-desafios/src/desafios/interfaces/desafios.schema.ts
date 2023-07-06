@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import mongoose from 'mongoose';
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { IDesafioStatusEnum } from './desafio-status.enum';
 
@@ -31,3 +31,5 @@ export class Desafio {
   @Prop({ type: mongoose.Schema.Types.ObjectId })
   partida: string;
 }
+
+export const DesafiosSchema = SchemaFactory.createForClass(Desafio);
