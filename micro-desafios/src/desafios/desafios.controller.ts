@@ -55,6 +55,49 @@ export class DesafiosController {
     }
   }
 
+  @EventPattern('atualizar-desafio')
+  async atualizarDesafio(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<IDesafio> {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      const idDesafio: string = data.idDesafio;
+
+      const desafio: IDesafio = data.desafio;
+
+      const desafioAtualizado = await this.desafiosService.atualizarDesafio(
+        idDesafio,
+        desafio,
+      );
+
+      await channel.ack(originalMessage);
+
+      return desafioAtualizado;
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+    }
+  }
+
+  @EventPattern('deletar-desafio')
+  async deletarDesafio(
+    @Payload() idDesafio: string,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      await this.desafiosService.deletarDesafio(idDesafio);
+
+      await channel.ack(originalMessage);
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+    }
+  }
+
   @MessagePattern('consultar-desafio')
   async consultarDesafiosPorId(
     @Payload() idDesafio: string,
@@ -102,7 +145,7 @@ export class DesafiosController {
     const originalMessage = context.getMessage();
 
     try {
-      const desafios = await this.consultarDesafios();
+      const desafios = await this.desafiosService.consultarTodosDesafios();
 
       await channel.ack(originalMessage);
 

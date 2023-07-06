@@ -200,7 +200,7 @@ export class DesafiosController {
     }
 
     const desafioAtualizar = {
-      ...atualizarDesafioDTO,
+      desafio: atualizarDesafioDTO,
       idDesafio,
     };
 

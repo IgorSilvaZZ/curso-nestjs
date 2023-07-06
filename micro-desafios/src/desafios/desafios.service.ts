@@ -60,7 +60,7 @@ export class DesafiosService {
   async atualizarDesafio(
     idDesafio: string,
     atualizarDesafio: IDesafio,
-  ): Promise<void> {
+  ): Promise<IDesafio> {
     try {
       const desafioEncontrado = await this.desafioModel
         .findOne({ _id: idDesafio })
@@ -78,15 +78,17 @@ export class DesafiosService {
         dataHoraResposta = new Date();
       }
 
-      const desafioAtualizado = {
+      const dataDesafioAtualizado = {
         ...atualizarDesafio,
         dataHoraDesafio: atualizarDesafio.dataHoraDesafio,
         dataHoraResposta,
       };
 
-      await this.desafioModel
-        .findOneAndUpdate({ _id: idDesafio }, { $set: desafioAtualizado })
+      const desafioAtualizado = await this.desafioModel
+        .findOneAndUpdate({ _id: idDesafio }, { $set: dataDesafioAtualizado })
         .exec();
+
+      return desafioAtualizado;
     } catch (error) {
       this.logger.log(`Error ${JSON.stringify(error.message)}`);
       throw new RpcException(error.message);
