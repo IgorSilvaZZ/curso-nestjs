@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller } from '@nestjs/common';
+import { BadRequestException, Controller } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,
@@ -65,6 +65,21 @@ export class JogadoresController {
     }
   }
 
+  @MessagePattern('consultar-jogador-email')
+  async consultarJogarEmail(
+    @Payload() email: string,
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      return await this.jogadoresService.consultarJogadoresPeloEmail(email);
+    } finally {
+      await channel.ack(originalMessage);
+    }
+  }
+
   @EventPattern('criar-jogador')
   async criarJogador(@Payload() criarJogador: any, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
@@ -72,8 +87,6 @@ export class JogadoresController {
 
     try {
       const categoria: string = criarJogador.categoria;
-
-      await this.categoriaService.consultarCategoriaPeloId(categoria);
 
       const jogador: IJogador = {
         ...criarJogador.jogador,

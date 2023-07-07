@@ -8,8 +8,4 @@ export class AtualizarDesafioDTO {
   @IsOptional()
   @IsEnum(IDesafioAtualizarStatusEnum)
   status: string;
-
-  /* @IsOptional()
-  @IsDateString()
-  dataHoraDesafio: Date; */
 }

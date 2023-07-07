@@ -11,11 +11,13 @@ import { IPartida } from './interfaces/partidas.interface';
 import { IDesafio } from '../desafios/interfaces/desafio.interface';
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 
+import { Partida } from './interfaces/partidas.schema';
+
 @Injectable()
 export class PartidasService {
   constructor(
     @InjectModel('partida')
-    private readonly partidaModel: Model<IPartida>,
+    private readonly partidaModel: Model<Partida>,
     private readonly clientProxySmartRaking: ClientProxySmartRanking,
   ) {}
 

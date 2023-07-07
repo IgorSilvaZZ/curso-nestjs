@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,11 +9,13 @@ import { IDesafio } from './interfaces/desafio.interface';
 import { RpcException } from '@nestjs/microservices';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 
+import { Desafio } from './interfaces/desafios.schema';
+
 @Injectable()
 export class DesafiosService {
   constructor(
     @InjectModel('desafio')
-    private readonly desafioModel: Model<IDesafio>,
+    private readonly desafioModel: Model<Desafio>,
   ) {}
 
   logger = new Logger(DesafiosService.name);
@@ -22,14 +24,12 @@ export class DesafiosService {
     return await this.desafioModel.find().exec();
   }
 
-  async consultarDesafioPeloId(idDesafio: string): Promise<IDesafio> {
-    const desafioEncontrado = await this.desafioModel.findOne({
-      _id: idDesafio,
-    });
-
-    if (!desafioEncontrado) {
-      throw new RpcException(`Desafio com id ${idDesafio}, não encontrada`);
-    }
+  async consultarDesafioPeloId(idDesafio: string): Promise<IDesafio | null> {
+    const desafioEncontrado = await this.desafioModel
+      .findOne({
+        _id: idDesafio,
+      })
+      .exec();
 
     return desafioEncontrado;
   }
@@ -47,79 +47,62 @@ export class DesafiosService {
   }
 
   async criarDesafio(criarDesafio: IDesafio): Promise<IDesafio> {
-    try {
-      const desafioCriado = new this.desafioModel(criarDesafio);
+    const desafioCriado = new this.desafioModel(criarDesafio);
 
-      return await desafioCriado.save();
-    } catch (error) {
-      this.logger.log(`Error ${JSON.stringify(error.message)}`);
-      throw new RpcException(error.message);
-    }
+    return await desafioCriado.save();
   }
 
   async atualizarDesafio(
     idDesafio: string,
     atualizarDesafio: IDesafio,
-  ): Promise<IDesafio> {
-    try {
-      const desafioEncontrado = await this.desafioModel
-        .findOne({ _id: idDesafio })
-        .exec();
+  ): Promise<IDesafio | null> {
+    const desafioEncontrado = await this.desafioModel
+      .findById(idDesafio)
+      .exec();
 
-      if (!desafioEncontrado) {
-        throw new RpcException(
-          `O desafio com id ${idDesafio}, não foi encontrado!`,
-        );
-      }
-
-      let dataHoraResposta: Date;
-
-      if (atualizarDesafio.status) {
-        dataHoraResposta = new Date();
-      }
-
-      const dataDesafioAtualizado = {
-        ...atualizarDesafio,
-        dataHoraDesafio: atualizarDesafio.dataHoraDesafio,
-        dataHoraResposta,
-      };
-
-      const desafioAtualizado = await this.desafioModel
-        .findOneAndUpdate({ _id: idDesafio }, { $set: dataDesafioAtualizado })
-        .exec();
-
-      return desafioAtualizado;
-    } catch (error) {
-      this.logger.log(`Error ${JSON.stringify(error.message)}`);
-      throw new RpcException(error.message);
+    if (!desafioEncontrado) {
+      return null;
     }
+
+    let dataHoraResposta: Date;
+
+    if (atualizarDesafio.status) {
+      dataHoraResposta = new Date();
+    }
+
+    const dataDesafioAtualizado = {
+      ...atualizarDesafio,
+      dataHoraDesafio: atualizarDesafio.dataHoraDesafio,
+      dataHoraResposta,
+    };
+
+    const desafioAtualizado = await this.desafioModel
+      .findOneAndUpdate({ _id: idDesafio }, { $set: dataDesafioAtualizado })
+      .exec();
+
+    return desafioAtualizado;
   }
 
   async atualizarDesafioPartida(
     idPartida: string,
     desafio: IDesafio,
   ): Promise<void> {
-    try {
-      desafio.status = IDesafioStatusEnum.REALIZADO;
-      desafio.partida = idPartida;
+    desafio.status = IDesafioStatusEnum.REALIZADO;
+    desafio.partida = idPartida;
 
-      await this.desafioModel
-        .findOneAndUpdate({ _id: desafio._id }, { $set: desafio })
-        .exec();
-    } catch (error) {
-      this.logger.log(`Error ${JSON.stringify(error.message)}`);
-      throw new RpcException(error.message);
-    }
+    await this.desafioModel
+      .findOneAndUpdate({ _id: desafio._id }, { $set: desafio })
+      .exec();
   }
 
-  async deletarDesafio(idDesafio: string): Promise<void> {
+  async deletarDesafio(idDesafio: string): Promise<IDesafio | null> {
     try {
       const desafioEncontrado = await this.desafioModel
         .findOne({ _id: idDesafio })
         .exec();
 
       if (!desafioEncontrado) {
-        throw new RpcException(`Desafio com id ${idDesafio}, não encontrado!`);
+        return null;
       }
 
       await this.desafioModel

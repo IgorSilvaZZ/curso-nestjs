@@ -8,10 +8,9 @@ import {
   Param,
   Post,
   Put,
-  Delete,
-  Query,
   UsePipes,
   ValidationPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
@@ -38,26 +37,36 @@ export class CategoriasController {
   }
 
   @Get()
-  async consultarCategorias(@Query('idCategoria') _id: string) {
+  async consultarCategorias() {
     return await lastValueFrom(
-      this.clientAdminBackend.send('consultar-categorias', _id ? _id : ''),
+      this.clientAdminBackend.send('consultar-categorias', ''),
+    );
+  }
+
+  @Get('/:idCategoria')
+  async consultarCategoriaPeloId(@Param('idCategoria') idCategoria: string) {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-categoria', idCategoria),
     );
   }
 
   @Put('/:_id')
   @UsePipes(ValidationPipe)
-  atualizarCategoria(
+  async atualizarCategoria(
     @Body() atualizarCategoriaDTO: AtualizarCategoriaDTO,
     @Param('_id', ValidacaoParametrosPipe) _id: string,
   ) {
+    const categoriaEncontrada = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-categoria', _id),
+    );
+
+    if (!categoriaEncontrada) {
+      throw new BadRequestException(`Categoria com id: ${_id} não encontrada!`);
+    }
+
     this.clientAdminBackend.emit('atualizar-categoria', {
       id: _id,
       categoria: atualizarCategoriaDTO,
     });
-  }
-
-  @Delete('/:_id')
-  deletarJogador(@Param('_id', ValidacaoParametrosPipe) _id: string) {
-    this.clientAdminBackend.emit('deletar-jogador', _id);
   }
 }

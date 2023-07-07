@@ -53,19 +53,24 @@ export class CategoriasController {
   }
 
   @MessagePattern('consultar-categorias')
-  async consultarCategorias(
-    @Payload() _id: string,
-    @Ctx() context: RmqContext,
-  ) {
+  async consultarCategorias(_, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
 
     try {
-      if (_id) {
-        return await this.categoriasService.consultarCategoriaPeloId(_id);
-      } else {
-        return await this.categoriasService.consultarCategorias();
-      }
+      return await this.categoriasService.consultarCategorias();
+    } finally {
+      await channel.ack(originalMessage);
+    }
+  }
+
+  @MessagePattern('consultar-categoria')
+  async consultarCategoria(@Payload() _id: string, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      return await this.categoriasService.consultarCategoriaPeloId(_id);
     } finally {
       await channel.ack(originalMessage);
     }

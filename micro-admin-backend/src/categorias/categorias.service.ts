@@ -32,13 +32,11 @@ export class CategoriasService {
   }
 
   async consultarCategoriaPeloId(categoria: string): Promise<ICategoria> {
-    const categoriaEncontrada = await this.categoriaModel.findOne({
-      _id: categoria,
-    });
-
-    if (!categoriaEncontrada) {
-      throw new RpcException('Categoria não encontrada!');
-    }
+    const categoriaEncontrada = await this.categoriaModel
+      .findOne({
+        _id: categoria,
+      })
+      .exec();
 
     return categoriaEncontrada;
   }
@@ -47,14 +45,6 @@ export class CategoriasService {
     _id: string,
     atualizarCategoriaDTO: ICategoria,
   ): Promise<void> {
-    const categoriaEncontrada = await this.categoriaModel
-      .findOne({ _id })
-      .exec();
-
-    if (!categoriaEncontrada) {
-      throw new RpcException('Categoria não encontrada!');
-    }
-
     await this.categoriaModel
       .findOneAndUpdate({ _id }, { $set: atualizarCategoriaDTO })
       .exec();

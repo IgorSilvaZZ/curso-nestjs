@@ -49,10 +49,20 @@ export class JogadoresController {
       telefoneCelular: criarJogadorDTO.telefoneCelular,
     };
 
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador-email', jogador.email),
+    );
+
+    if (jogadorExistente) {
+      throw new BadRequestException(
+        `Jogador com email ${jogador.email} já cadastrado!`,
+      );
+    }
+
     const categoria = criarJogadorDTO.categoria;
 
     const categoriaExistente = await lastValueFrom(
-      this.clientAdminBackend.send('consultar-categorias', categoria),
+      this.clientAdminBackend.send('consultar-categoria', categoria),
     );
 
     if (Object.values(categoriaExistente).length > 0) {
@@ -116,20 +126,38 @@ export class JogadoresController {
     );
   }
 
-  @Put('/:_id')
+  @Put('/:idJogador')
   @UsePipes(ValidationPipe)
-  atualizarJogador(
+  async atualizarJogador(
     @Body() atualizarJogadorDTO: AtualizarJogadorDTO,
-    @Param('_id', ValidacaoParametrosPipe) _id: string,
+    @Param('idJogador', ValidacaoParametrosPipe) idJogador: string,
   ) {
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', idJogador),
+    );
+
+    if (!jogadorExistente) {
+      throw new BadRequestException(
+        `Jogador com id: ${idJogador}, não encontrado!`,
+      );
+    }
+
     this.clientAdminBackend.emit('atualizar-jogador', {
-      id: _id,
+      id: idJogador,
       jogador: atualizarJogadorDTO,
     });
   }
 
   @Delete('/:_id')
   async deletarJogador(@Param('_id', ValidacaoParametrosPipe) _id: string) {
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', _id),
+    );
+
+    if (!jogadorExistente) {
+      throw new BadRequestException(`Jogador com id: ${_id}, não encontrado!`);
+    }
+
     this.clientAdminBackend.emit('deletar-jogador', _id);
   }
 }

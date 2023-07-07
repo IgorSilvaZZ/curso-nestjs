@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller } from '@nestjs/common';
+import { Controller, UseFilters } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,
@@ -93,13 +93,13 @@ export class DesafiosController {
     const originalMessage = context.getMessage();
 
     try {
-      const desafios = await this.desafiosService.consultarDesafioPeloId(
+      const desafio = await this.desafiosService.consultarDesafioPeloId(
         idDesafio,
       );
 
       await channel.ack(originalMessage);
 
-      return desafios;
+      return desafio;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
     }

@@ -50,7 +50,7 @@ export class DesafiosController {
 
     if (!jogadorCadastrado) {
       throw new BadRequestException(
-        `O Jogador com ${idJogador} não está cadastrado!`,
+        `O Jogador com id: ${idJogador}, não está cadastrado!`,
       );
     }
 
@@ -87,37 +87,47 @@ export class DesafiosController {
     // Verificar se a categoria esta cadastrada
     await lastValueFrom(
       this.clientAdminBackend.send(
-        'consultar-categorias',
+        'consultar-categoria',
         criarDesafioDTO.categoria,
       ),
     );
 
     // Verificando se o solicitante é um jogador da partida
-    const jogadorFazParteDesafio = criarDesafioDTO.jogadores.find(
+    const solicitanteFazParteDesafio = criarDesafioDTO.jogadores.find(
       (jogador) => jogador._id === criarDesafioDTO.solicitante,
     );
 
-    if (!jogadorFazParteDesafio) {
+    if (!solicitanteFazParteDesafio) {
       throw new BadRequestException(
         `O Solicitante com id ${criarDesafioDTO.solicitante}, não faz parte do desafio! Informe um ID solicitante que faça parte do desafio!`,
       );
     }
 
-    // Verificando se o jogador realmente pertence a categoria que foi informada
-    const jogadorCategoriaNaoCorrespondente = jogadoresCadastrados.filter(
-      (jogador) => jogador.categoria !== criarDesafioDTO.categoria,
+    // Verificando se os jogadores realmente pertencem a categoria que foi informada no body da requisição
+    const jogadorCategoriaNaoCorrespondente = criarDesafioDTO.jogadores.filter(
+      (jogador) =>
+        jogadoresCadastrados.some(
+          (jogadorCadastrado) =>
+            jogador._id == jogadorCadastrado._id &&
+            jogadorCadastrado.categoria !== criarDesafioDTO.categoria,
+        ),
     );
 
     if (jogadorCategoriaNaoCorrespondente.length > 0) {
       throw new BadRequestException(
-        `Jogadore(s) ${jogadorCategoriaNaoCorrespondente
-          .map((item) => item.nome)
-          .join(', ')} não está com a categoria correspondente!`,
+        `Jogadore(s) com id: (${jogadorCategoriaNaoCorrespondente
+          .map((item) => item._id)
+          .join(', ')}), não está com a categoria correspondente!`,
       );
     }
 
+    const dataCriarDesafio = {
+      ...criarDesafioDTO,
+      status: IDesafioStatusEnum.PENDENTE,
+    };
+
     return await lastValueFrom(
-      this.clientChallenges.emit('criar-desafio', criarDesafioDTO),
+      this.clientChallenges.emit('criar-desafio', dataCriarDesafio),
     );
   }
 
@@ -183,7 +193,7 @@ export class DesafiosController {
     @Param('idDesafio', ValidacaoParametrosPipe) idDesafio: string,
     @Body() atualizarDesafioDTO: AtualizarDesafioDTO,
   ) {
-    const desafioCadastrado: IDesafio = await lastValueFrom(
+    const desafioCadastrado = await lastValueFrom(
       this.clientChallenges.send('consultar-desafio', idDesafio),
     );
 
