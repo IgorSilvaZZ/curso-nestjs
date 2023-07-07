@@ -14,21 +14,7 @@ import { DesafiosService } from './desafios.service';
 
 import { IDesafio } from './interfaces/desafio.interface';
 
-const acksErros: string[] = ['E11000'];
-
-async function ackMessageError(
-  channel: any,
-  originalMessage: any,
-  messageError: string,
-) {
-  const filterAckError = acksErros.filter((ackError) =>
-    messageError.includes(ackError),
-  );
-
-  if (filterAckError) {
-    await channel.ack(originalMessage);
-  }
-}
+import { ackMessageError } from '../utils/ackMessageError';
 
 @Controller('desafios')
 export class DesafiosController {
