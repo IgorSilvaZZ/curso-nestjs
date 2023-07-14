@@ -3,8 +3,6 @@
 import { NestFactory } from '@nestjs/core';
 /* import moment from 'moment'; */
 
-import moment from 'moment-timezone';
-
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { LogginInterceptor } from './interceptors/loggin.interceptor';

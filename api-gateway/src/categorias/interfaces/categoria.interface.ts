@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Document } from 'mongoose';
-
-export interface ICategoria extends Document {
+export interface ICategoria {
   readonly _id: string;
   readonly categoria: string;
   descricao: string;

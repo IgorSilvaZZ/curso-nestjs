@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller } from '@nestjs/common';
+import { BadRequestException, Controller } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,
@@ -41,12 +41,13 @@ export class JogadoresController {
   logger = new Logger(JogadoresController.name);
 
   @MessagePattern('consultar-jogadores')
-  async consultarJogadores(_, @Ctx() context: RmqContext) {
+  async consultarJogadores(_, @Ctx() context: RmqContext): Promise<IJogador[]> {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
 
     try {
-      return this.jogadoresService.consultarTodosJogadores();
+      const jogadores = await this.jogadoresService.consultarTodosJogadores();
+      return jogadores;
     } finally {
       await channel.ack(originalMessage);
     }
@@ -58,7 +59,22 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      return this.jogadoresService.consultarJogadorPeloId(id);
+      return await this.jogadoresService.consultarJogadorPeloId(id);
+    } finally {
+      await channel.ack(originalMessage);
+    }
+  }
+
+  @MessagePattern('consultar-jogador-email')
+  async consultarJogarEmail(
+    @Payload() email: string,
+    @Ctx() context: RmqContext,
+  ) {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      return await this.jogadoresService.consultarJogadoresPeloEmail(email);
     } finally {
       await channel.ack(originalMessage);
     }
@@ -70,11 +86,12 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      const idCategoria: string = criarJogador.idCategoria;
+      const categoria: string = criarJogador.categoria;
 
-      await this.categoriaService.consultarCategoriaPeloId(idCategoria);
-
-      const jogador: IJogador = criarJogador.jogador;
+      const jogador: IJogador = {
+        ...criarJogador.jogador,
+        categoria,
+      };
 
       const novoJogador = await this.jogadoresService.criarJogador(jogador);
 

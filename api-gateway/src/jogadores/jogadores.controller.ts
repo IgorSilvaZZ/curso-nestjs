@@ -11,10 +11,9 @@ import {
   Param,
   BadRequestException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 import {
   Delete,
-  Query,
   UploadedFile,
   UseInterceptors,
   UsePipes,
@@ -50,16 +49,25 @@ export class JogadoresController {
       telefoneCelular: criarJogadorDTO.telefoneCelular,
     };
 
-    const idCategoria = criarJogadorDTO.idCategoria;
-
-    const categoria = await this.clientAdminBackend.send(
-      'consultar-categorias',
-      idCategoria,
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador-email', jogador.email),
     );
 
-    if (Object.values(categoria).length > 0) {
-      await this.clientAdminBackend.emit('criar-jogador', {
-        idCategoria,
+    if (jogadorExistente) {
+      throw new BadRequestException(
+        `Jogador com email ${jogador.email} já cadastrado!`,
+      );
+    }
+
+    const categoria = criarJogadorDTO.categoria;
+
+    const categoriaExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-categoria', categoria),
+    );
+
+    if (Object.values(categoriaExistente).length > 0) {
+      this.clientAdminBackend.emit('criar-jogador', {
+        categoria,
         jogador,
       });
     } else {
@@ -73,9 +81,8 @@ export class JogadoresController {
     this.logger.log(`file ${file}`);
 
     // Verificar se o jogador esta cadastrado
-    const jogadorExiste = await this.clientAdminBackend.send(
-      'consultar-jogador',
-      id,
+    const jogadorExiste = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
     );
 
     if (!jogadorExiste) {
@@ -93,41 +100,64 @@ export class JogadoresController {
     const atualizarJogadorDTO: AtualizarJogadorDTO = {};
     atualizarJogadorDTO.urlFotoJogador = urlFotoJogador;
 
-    await this.clientAdminBackend.emit('atualizar-jogador', {
+    this.clientAdminBackend.emit('atualizar-jogador', {
       id,
       jogador: atualizarJogadorDTO,
     });
 
     // Retornar o jogador atualizado para o cliente
-    return this.clientAdminBackend.send('consultar-jogador', id);
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
+    );
   }
 
   @Get()
-  consultarJogadores(): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogadores', '');
+  async consultarJogadores() {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogadores', ''),
+    );
   }
 
-  @Get()
-  consultarJogador(
-    @Query('idJogador', ValidacaoParametrosPipe) _id: string,
-  ): Observable<any> {
-    return this.clientAdminBackend.send('consultar-jogador', _id);
-  }
-
-  @Put('/:_id')
+  @Get('/:id')
   @UsePipes(ValidationPipe)
-  atualizarJogador(
+  async consultarJogador(@Param('id', ValidacaoParametrosPipe) id: string) {
+    return await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', id),
+    );
+  }
+
+  @Put('/:idJogador')
+  @UsePipes(ValidationPipe)
+  async atualizarJogador(
     @Body() atualizarJogadorDTO: AtualizarJogadorDTO,
-    @Param('_id', ValidacaoParametrosPipe) _id: string,
+    @Param('idJogador', ValidacaoParametrosPipe) idJogador: string,
   ) {
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', idJogador),
+    );
+
+    if (!jogadorExistente) {
+      throw new BadRequestException(
+        `Jogador com id: ${idJogador}, não encontrado!`,
+      );
+    }
+
     this.clientAdminBackend.emit('atualizar-jogador', {
-      id: _id,
+      id: idJogador,
       jogador: atualizarJogadorDTO,
     });
   }
 
   @Delete('/:_id')
   async deletarJogador(@Param('_id', ValidacaoParametrosPipe) _id: string) {
+    const jogadorExistente = await lastValueFrom(
+      this.clientAdminBackend.send('consultar-jogador', _id),
+    );
+
+    if (!jogadorExistente) {
+      throw new BadRequestException(`Jogador com id: ${_id}, não encontrado!`);
+    }
+
     this.clientAdminBackend.emit('deletar-jogador', _id);
   }
 }

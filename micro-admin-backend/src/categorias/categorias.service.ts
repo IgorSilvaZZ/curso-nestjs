@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { ICategoria } from './interfaces/categoria.interface';
-import { IJogador } from 'src/jogadores/interfaces/jogador.interface';
 
 @Injectable()
 export class CategoriasService {
@@ -29,20 +28,15 @@ export class CategoriasService {
   }
 
   async consultarCategorias(): Promise<ICategoria[]> {
-    return await this.categoriaModel
-      .find()
-      .populate([{ path: 'jogadores', model: 'jogador' }])
-      .exec();
+    return await this.categoriaModel.find().exec();
   }
 
   async consultarCategoriaPeloId(categoria: string): Promise<ICategoria> {
-    const categoriaEncontrada = await this.categoriaModel.findOne({
-      _id: categoria,
-    });
-
-    if (!categoriaEncontrada) {
-      throw new RpcException('Categoria não encontrada!');
-    }
+    const categoriaEncontrada = await this.categoriaModel
+      .findOne({
+        _id: categoria,
+      })
+      .exec();
 
     return categoriaEncontrada;
   }
@@ -51,14 +45,6 @@ export class CategoriasService {
     _id: string,
     atualizarCategoriaDTO: ICategoria,
   ): Promise<void> {
-    const categoriaEncontrada = await this.categoriaModel
-      .findOne({ _id })
-      .exec();
-
-    if (!categoriaEncontrada) {
-      throw new RpcException('Categoria não encontrada!');
-    }
-
     await this.categoriaModel
       .findOneAndUpdate({ _id }, { $set: atualizarCategoriaDTO })
       .exec();

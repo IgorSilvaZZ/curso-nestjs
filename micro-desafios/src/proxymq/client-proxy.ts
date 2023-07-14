@@ -14,7 +14,7 @@ export class ClientProxySmartRanking {
 
   private RABBITMQ_URL = this.configService.get<string>('RABBITMQ_URL');
 
-  getClientProxyInstance(): ClientProxy {
+  getClientProxyInstanceAdminBackEnd(): ClientProxy {
     return ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
