@@ -14,6 +14,16 @@ export class ClientProxySmartRanking {
 
   private RABBITMQ_URL = this.configService.get<string>('RABBITMQ_URL');
 
+  getClientProxyInstanceAdminBackEnd(): ClientProxy {
+    return ClientProxyFactory.create({
+      transport: Transport.RMQ,
+      options: {
+        urls: [this.RABBITMQ_URL],
+        queue: 'admin-backend',
+      },
+    });
+  }
+
   getClientProxyInstanceChallenges(): ClientProxy {
     return ClientProxyFactory.create({
       transport: Transport.RMQ,

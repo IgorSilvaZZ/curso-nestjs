@@ -27,28 +27,23 @@ export class PartidasService {
     this.clientProxySmartRaking.getClientProxyInstanceChallenges();
 
   async criarPartida(criarPartida: IPartida): Promise<IPartida> {
-    try {
-      const partidaCriada = new this.partidaModel(criarPartida);
+    const partidaCriada = new this.partidaModel(criarPartida);
 
-      const novaPartida = await partidaCriada.save();
+    const novaPartida = await partidaCriada.save();
 
-      const idPartida = novaPartida._id;
+    const idPartida = novaPartida._id;
 
-      const desafio: IDesafio = await lastValueFrom(
-        this.clientChallenges.send('consultar-desafio', {
-          idDesafio: novaPartida.desafio,
-        }),
-      );
+    const desafio: IDesafio = await lastValueFrom(
+      this.clientChallenges.send('consultar-desafio', {
+        idDesafio: novaPartida.desafio,
+      }),
+    );
 
-      return await lastValueFrom(
-        this.clientChallenges.emit('atualizar-desafio-partida', {
-          idPartida,
-          desafio,
-        }),
-      );
-    } catch (error) {
-      this.logger.log(`Error ${JSON.stringify(error.message)}`);
-      throw new RpcException(error.message);
-    }
+    return await lastValueFrom(
+      this.clientChallenges.emit('atualizar-desafio-partida', {
+        idPartida,
+        desafio,
+      }),
+    );
   }
 }

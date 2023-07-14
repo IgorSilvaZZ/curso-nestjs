@@ -96,24 +96,19 @@ export class DesafiosService {
   }
 
   async deletarDesafio(idDesafio: string): Promise<IDesafio | null> {
-    try {
-      const desafioEncontrado = await this.desafioModel
-        .findOne({ _id: idDesafio })
-        .exec();
+    const desafioEncontrado = await this.desafioModel
+      .findOne({ _id: idDesafio })
+      .exec();
 
-      if (!desafioEncontrado) {
-        return null;
-      }
-
-      await this.desafioModel
-        .findByIdAndUpdate(
-          { _id: idDesafio },
-          { $set: { status: IDesafioStatusEnum.CANCELADO } },
-        )
-        .exec();
-    } catch (error) {
-      this.logger.log(`Error ${JSON.stringify(error.message)}`);
-      throw new RpcException(error.message);
+    if (!desafioEncontrado) {
+      return null;
     }
+
+    await this.desafioModel
+      .findByIdAndUpdate(
+        { _id: idDesafio },
+        { $set: { status: IDesafioStatusEnum.CANCELADO } },
+      )
+      .exec();
   }
 }

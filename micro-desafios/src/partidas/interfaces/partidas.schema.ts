@@ -17,6 +17,9 @@ export class Partida {
   @Prop({ type: mongoose.Schema.Types.ObjectId })
   def: string;
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  jogadores: string[]
+
   @Prop()
   resultado: IResultado[];
 }

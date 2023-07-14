@@ -159,16 +159,7 @@ export class DesafiosController {
       );
     }
 
-    // const desafiosCadastrados: IDesafio[] = await lastValueFrom(this.clientChallenges.send('consultar-desafios', ''));
-
-    const jogadorFazParteDesafio = await lastValueFrom(
-      this.clientChallenges.send(
-        'consultar-vencedor-desafio',
-        atribuirDesafioPartidaDTO.def,
-      ),
-    );
-
-    if (!jogadorFazParteDesafio) {
+    if (!desafioCadastrado.jogadores.includes(atribuirDesafioPartidaDTO.def)) {
       throw new BadRequestException(
         `Jogador vencedor com id ${atribuirDesafioPartidaDTO.def}, não faz parte do desafio!`,
       );
@@ -178,6 +169,8 @@ export class DesafiosController {
       categoria: desafioCadastrado.categoria,
       def: atribuirDesafioPartidaDTO.def,
       resultado: atribuirDesafioPartidaDTO.resultado,
+      jogadores: desafioCadastrado.jogadores,
+      desafio: desafioCadastrado._id,
     };
 
     const partidaCriada = await lastValueFrom(

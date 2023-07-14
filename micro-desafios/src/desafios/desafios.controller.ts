@@ -67,6 +67,26 @@ export class DesafiosController {
     }
   }
 
+  @EventPattern('atualizar-desafio-partida')
+  async atualizarDesafioPartida(
+    @Payload() data: any,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      const idPartida: string = data.idPartida;
+      const desafio: IDesafio = data.desafio;
+
+      await this.desafiosService.atualizarDesafioPartida(idPartida, desafio);
+
+      await channel.ack(originalMessage);
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+    }
+  }
+
   @EventPattern('deletar-desafio')
   async deletarDesafio(
     @Payload() idDesafio: string,

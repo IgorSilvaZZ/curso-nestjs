@@ -4,6 +4,7 @@ import { IJogador } from '../../jogadores/interfaces/jogador.interface';
 import { IDesafioStatusEnum } from './desafio-status.enum';
 
 export interface IDesafio {
+  _id: string;
   dataHoraDesafio: Date;
   status: IDesafioStatusEnum;
   dataHoraSolicitacao: Date;

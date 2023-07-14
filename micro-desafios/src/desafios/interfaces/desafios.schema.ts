@@ -3,6 +3,8 @@
 import mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
+import { Partida } from '../../partidas/interfaces/partidas.schema';
+
 import { IDesafioStatusEnum } from './desafio-status.enum';
 
 @Schema({ timestamps: true, collection: 'desafios' })
@@ -28,7 +30,7 @@ export class Desafio {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId }] })
   jogadores: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Partida.name })
   partida: string;
 }
 
