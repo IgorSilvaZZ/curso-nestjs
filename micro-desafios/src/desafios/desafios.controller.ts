@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, UseFilters } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,

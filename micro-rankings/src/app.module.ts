@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 
 import { Module } from '@nestjs/common';
-import { RankingsModule } from './rankings/rankings.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { RankingsModule } from './rankings/rankings.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
     RankingsModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [],
   providers: [],

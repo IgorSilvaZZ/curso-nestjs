@@ -10,7 +10,7 @@ import { PartidasService } from './partidas.service';
 
 import { ackMessageError } from '../utils/ackMessageError';
 
-@Controller('partidas')
+@Controller()
 export class PartidasController {
   constructor(private readonly partidaService: PartidasService) {}
 

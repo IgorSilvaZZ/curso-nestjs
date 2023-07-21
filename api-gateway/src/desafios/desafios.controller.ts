@@ -24,6 +24,7 @@ import { IJogador } from '../jogadores/interfaces/jogador.interface';
 import { IDesafio } from './interfaces/desafio.interface';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 import { AtribuirDesafioPartidaDTO } from './dtos/atribuirDesafioPartida.dto';
+import { IPartida } from './interfaces/partida.interface';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -165,7 +166,7 @@ export class DesafiosController {
       );
     }
 
-    const novaPartida = {
+    const novaPartida: IPartida = {
       categoria: desafioCadastrado.categoria,
       def: atribuirDesafioPartidaDTO.def,
       resultado: atribuirDesafioPartidaDTO.resultado,
@@ -203,7 +204,10 @@ export class DesafiosController {
     }
 
     const desafioAtualizar = {
-      desafio: atualizarDesafioDTO,
+      desafio: {
+        ...desafioCadastrado,
+        status: atualizarDesafioDTO.status,
+      },
       idDesafio,
     };
 

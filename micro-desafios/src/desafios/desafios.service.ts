@@ -1,12 +1,11 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { IDesafio } from './interfaces/desafio.interface';
-import { RpcException } from '@nestjs/microservices';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 
 import { Desafio } from './interfaces/desafios.schema';
@@ -89,6 +88,8 @@ export class DesafiosService {
   ): Promise<void> {
     desafio.status = IDesafioStatusEnum.REALIZADO;
     desafio.partida = idPartida;
+
+    this.logger.log(desafio);
 
     await this.desafioModel
       .findOneAndUpdate({ _id: desafio._id }, { $set: desafio })

@@ -42,6 +42,8 @@ export class PartidasService {
       }),
     );
 
+    this.logger.log(desafio);
+
     await lastValueFrom(
       this.clientChallenges.emit('atualizar-desafio-partida', {
         idPartida,
