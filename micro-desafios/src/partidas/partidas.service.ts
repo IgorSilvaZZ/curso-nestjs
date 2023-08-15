@@ -29,8 +29,10 @@ export class PartidasService {
   private clientRankings =
     this.clientProxySmartRaking.getClientProxyInstanceRankings();
 
-  async criarPartida(criarPartida: IPartida): Promise<IPartida> {
-    const partidaCriada = new this.partidaModel(criarPartida);
+  async criarPartida(partida: IPartida): Promise<IPartida> {
+    this.logger.log(partida);
+
+    const partidaCriada = new this.partidaModel(partida);
 
     const novaPartida = await partidaCriada.save();
 
@@ -41,8 +43,6 @@ export class PartidasService {
         idDesafio: novaPartida.desafio,
       }),
     );
-
-    this.logger.log(desafio);
 
     await lastValueFrom(
       this.clientChallenges.emit('atualizar-desafio-partida', {
