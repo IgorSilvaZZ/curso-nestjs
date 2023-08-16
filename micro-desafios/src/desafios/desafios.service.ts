@@ -89,8 +89,6 @@ export class DesafiosService {
     desafio.status = IDesafioStatusEnum.REALIZADO;
     desafio.partida = idPartida;
 
-    this.logger.log(desafio);
-
     await this.desafioModel
       .findOneAndUpdate({ _id: desafio._id }, { $set: desafio })
       .exec();

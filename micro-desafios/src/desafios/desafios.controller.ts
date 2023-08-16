@@ -117,11 +117,11 @@ export class DesafiosController {
         idDesafio,
       );
 
-      await channel.ack(originalMessage);
-
       return desafio;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+    } finally {
+      await channel.ack(originalMessage);
     }
   }
 

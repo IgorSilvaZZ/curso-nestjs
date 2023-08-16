@@ -174,11 +174,13 @@ export class DesafiosController {
       desafio: desafioCadastrado._id,
     };
 
-    const partidaCriada = await lastValueFrom(
+    /* const partidaCriada = await lastValueFrom(
       this.clientChallenges.emit('criar-partida', novaPartida),
-    );
+    ); */
 
-    return partidaCriada;
+    return this.clientChallenges.emit('criar-partida', novaPartida);
+
+    // return partidaCriada;
   }
 
   @Put('/:idDesafio')

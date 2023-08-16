@@ -13,5 +13,6 @@ import { DesafiosSchema } from './interfaces/desafios.schema';
   ],
   controllers: [DesafiosController],
   providers: [DesafiosService],
+  exports: [DesafiosService],
 })
 export class DesafiosModule {}
