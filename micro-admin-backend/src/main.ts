@@ -15,6 +15,10 @@ async function bootstrap() {
     },
   });
 
+  Date.prototype.toJSON = function (): any {
+    return this.toLocaleDateString() + ' ' + this.toLocaleTimeString();
+  };
+
   await app.listen();
 }
 bootstrap();

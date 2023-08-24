@@ -20,8 +20,6 @@ export class RankingsController {
     const originalMessage = context.getMessage();
 
     try {
-      this.logger.log(`data: ${JSON.stringify(data)}`);
-
       const idPartida: string = data.idPartida;
       const partida: IPartida = data.partida;
 
@@ -30,6 +28,28 @@ export class RankingsController {
       await channel.ack(originalMessage);
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+    }
+  }
+
+  @EventPattern('consultar-rankings')
+  async consultarRakings(@Payload() data: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      const idCategoria: string = data.idCategoria;
+      const dataRef: string = data.dataRef;
+
+      const rankings = await this.rankingService.consultarRankings(
+        idCategoria,
+        dataRef,
+      );
+
+      return rankings;
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+    } finally {
+      await channel.ack(originalMessage);
     }
   }
 }

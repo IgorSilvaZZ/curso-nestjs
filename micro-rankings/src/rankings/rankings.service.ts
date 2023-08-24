@@ -68,4 +68,17 @@ export class RankingsService {
       throw new RpcException(error.message);
     }
   }
+
+  async consultarRankings(idCategoria: string, dataRef: string) {
+    try {
+      this.logger.log(`idCategoria: ${idCategoria}`);
+      this.logger.log(`dataRef: ${dataRef}`);
+
+      return { ok: true };
+    } catch (error) {
+      this.logger.error(`Error: ${error}`);
+
+      throw new RpcException(error.message);
+    }
+  }
 }
