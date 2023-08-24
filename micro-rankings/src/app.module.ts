@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { RankingsModule } from './rankings/rankings.module';
+import { ProxyRMQModule } from './proxyrmq/proxyrmq.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RankingsModule } from './rankings/rankings.module';
     }),
     RankingsModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    ProxyRMQModule,
   ],
   controllers: [],
   providers: [],
