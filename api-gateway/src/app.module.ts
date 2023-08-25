@@ -14,9 +14,9 @@ import { RankingsModule } from './rankings/rankings.module';
     JogadoresModule,
     CategoriasModule,
     DesafiosModule,
+    RankingsModule,
     AwsModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    RankingsModule,
   ],
   controllers: [],
 })
