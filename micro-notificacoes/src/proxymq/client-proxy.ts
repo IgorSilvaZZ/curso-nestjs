@@ -43,15 +43,4 @@ export class ClientProxySmartRanking {
       },
     });
   }
-
-  getClientProxyInstanceNotifications(): ClientProxy {
-    return ClientProxyFactory.create({
-      transport: Transport.RMQ,
-      options: {
-        urls: [this.RABBITMQ_URL],
-        queue: 'notifications',
-      },
-    });
-  }
-
 }
