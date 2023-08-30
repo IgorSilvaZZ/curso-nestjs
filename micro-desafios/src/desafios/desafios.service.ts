@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as momentTz from 'moment-timezone';
 
 import { IDesafio } from './interfaces/desafio.interface';
-import { RpcException } from '@nestjs/microservices';
 import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 
 import { Desafio } from './interfaces/desafios.schema';
@@ -44,6 +44,36 @@ export class DesafiosService {
       .exec();
 
     return desafiosJogador;
+  }
+
+  async consultarDesafiosRealizados(idCategoria: string): Promise<IDesafio[]> {
+    return await this.desafioModel
+      .find()
+      .where('categoria')
+      .equals(idCategoria)
+      .where('status')
+      .equals(IDesafioStatusEnum.REALIZADO)
+      .exec();
+  }
+
+  async consultarDesafiosRealizadosPelaData(
+    idCategoria: string,
+    dataRef: string,
+  ): Promise<IDesafio[]> {
+    const dataRefNew = `${dataRef} 23:59:59.999`;
+
+    return await this.desafioModel
+      .find()
+      .where('categoria')
+      .equals(idCategoria)
+      .where('status')
+      .equals(IDesafioStatusEnum.REALIZADO)
+      .where('dataHoraDesafio', {
+        $lte: momentTz(dataRefNew)
+          .tz('UTC')
+          .format('YYYY-MM-DD HH:mm:ss.SSS+00:00'),
+      })
+      .exec();
   }
 
   async criarDesafio(criarDesafio: IDesafio): Promise<IDesafio> {

@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 
@@ -11,7 +9,7 @@ async function bootstrap() {
     options: {
       urls: ['amqp://localhost:5672/smartranking'],
       noAck: false,
-      queue: 'admin-backend',
+      queue: 'rankings',
     },
   });
 

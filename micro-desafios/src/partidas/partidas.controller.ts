@@ -10,7 +10,7 @@ import { PartidasService } from './partidas.service';
 
 import { ackMessageError } from '../utils/ackMessageError';
 
-@Controller('partidas')
+@Controller()
 export class PartidasController {
   constructor(private readonly partidaService: PartidasService) {}
 
@@ -20,16 +20,16 @@ export class PartidasController {
   async criarPartida(
     @Payload() novaPartida: IPartida,
     @Ctx() context: RmqContext,
-  ): Promise<IPartida> {
+  ): Promise<void> {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
 
     try {
-      const partidaCriada = await this.partidaService.criarPartida(novaPartida);
+      await this.partidaService.criarPartida(novaPartida);
 
       await channel.ack(originalMessage);
 
-      return partidaCriada;
+      // return partidaCriada;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
     }

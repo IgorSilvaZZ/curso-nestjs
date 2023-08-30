@@ -5,10 +5,11 @@ import mongoose from 'mongoose';
 
 import { IResultado } from './partidas.interface';
 import { IDesafio } from '../../desafios/interfaces/desafio.interface';
+import { Desafio } from '../../desafios/interfaces/desafios.schema';
 
-@Schema()
+@Schema({ timestamps: true, collection: 'partidas' })
 export class Partida {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Desafio' })
   desafio: IDesafio;
 
   @Prop()
@@ -17,8 +18,8 @@ export class Partida {
   @Prop({ type: mongoose.Schema.Types.ObjectId })
   def: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
-  jogadores: string[]
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId }] })
+  jogadores: string[];
 
   @Prop()
   resultado: IResultado[];

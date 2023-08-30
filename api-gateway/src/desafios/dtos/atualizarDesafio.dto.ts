@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsDateString, IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 
 import { IDesafioAtualizarStatusEnum } from '../interfaces/desafio-status.enum';
 

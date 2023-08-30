@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, UseFilters } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,
@@ -117,11 +117,11 @@ export class DesafiosController {
         idDesafio,
       );
 
-      await channel.ack(originalMessage);
-
       return desafio;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+    } finally {
+      await channel.ack(originalMessage);
     }
   }
 
@@ -160,4 +160,27 @@ export class DesafiosController {
       await ackMessageError(channel, originalMessage, error.message);
     }
   }
+
+  @MessagePattern('consultar-desafios-realizado')
+  async consultarDesafiosRealizados(@Payload() payload: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+
+    try {
+      const { idCategoria, dataRef } = payload;
+
+      if (dataRef) {
+        return await this.desafiosService.consultarDesafiosRealizadosPelaData(idCategoria, dataRef) ;
+      } else {
+        return await this.desafiosService.consultarDesafiosRealizados(idCategoria);  
+      } 
+
+      
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+    } finally {
+      await channel.ack(originalMessage);
+    }
+  } 
+
 }
