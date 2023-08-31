@@ -11,5 +11,9 @@ export interface IDesafio {
   solicitante: string;
   categoria: string;
   partida?: string;
-  jogadores: string[];
+  jogadores: JogadoresDesafio[];
+}
+
+interface JogadoresDesafio {
+  _id: string;
 }

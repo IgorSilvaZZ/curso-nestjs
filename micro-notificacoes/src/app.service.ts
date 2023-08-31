@@ -25,7 +25,7 @@ export class AppService {
   async enviarEmailParaAdversario(desafio: IDesafio) {
     //Identificando o ID do adversario
     const idAdversario = desafio.jogadores.find(
-      (jogador) => jogador !== desafio.solicitante,
+      (jogador) => jogador._id !== desafio.solicitante,
     );
 
     // Consultando as informações adicionais do adversario

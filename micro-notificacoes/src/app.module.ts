@@ -13,10 +13,12 @@ import { ProxyRMQModule } from './proxymq/proxymq.module';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: 'localhost',
-        port: '8005',
-        secure: false,
-        ignoreTLS: true,
+        host: 'sandbox.smtp.mailtrap.io',
+        port: '2525',
+        auth: {
+          user: '63e8be99c928e0',
+          pass: '40f83414bac8f2',
+        },
       },
     }),
     ProxyRMQModule,
