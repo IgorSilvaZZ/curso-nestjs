@@ -11,14 +11,20 @@ import { IDesafioStatusEnum } from './interfaces/desafio-status.enum';
 
 import { Desafio } from './interfaces/desafios.schema';
 
+import { ClientProxySmartRanking } from '../proxymq/client-proxy';
+
 @Injectable()
 export class DesafiosService {
   constructor(
     @InjectModel('desafio')
     private readonly desafioModel: Model<Desafio>,
+    private clientProxySmartRanking: ClientProxySmartRanking,
   ) {}
 
   logger = new Logger(DesafiosService.name);
+
+  private clientNotifications =
+    this.clientProxySmartRanking.getClientProxyInstanceNotifications();
 
   async consultarTodosDesafios(): Promise<IDesafio[]> {
     return await this.desafioModel.find().exec();
@@ -79,7 +85,11 @@ export class DesafiosService {
   async criarDesafio(criarDesafio: IDesafio): Promise<IDesafio> {
     const desafioCriado = new this.desafioModel(criarDesafio);
 
-    return await desafioCriado.save();
+    const novoDesafio = await desafioCriado.save();
+
+    this.clientNotifications.emit('notificacao-novo-desafio', criarDesafio);
+
+    return novoDesafio;
   }
 
   async atualizarDesafio(
