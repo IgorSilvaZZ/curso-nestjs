@@ -4,50 +4,37 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
   Param,
   Post,
   Put,
   UsePipes,
   ValidationPipe,
-  BadRequestException,
 } from '@nestjs/common';
-import { lastValueFrom } from 'rxjs';
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
 
 import { AtualizarCategoriaDTO } from './dtos/atualizarCategoria.dto';
 import { CriaCategoriaDTO } from './dtos/criarCategoria.dto';
-import { ClientProxySmartRanking } from 'src/proxymq/client-proxy';
+
+import { CategoriasService } from './categorias.service';
 
 @Controller('api/v1/categorias')
 export class CategoriasController {
-  constructor(
-    private readonly clientProxySmartRaking: ClientProxySmartRanking,
-  ) {}
-
-  private logger = new Logger(CategoriasController.name);
-
-  private clientAdminBackend =
-    this.clientProxySmartRaking.getClientProxyInstance();
+  constructor(private readonly categoriasService: CategoriasService) {}
 
   @Post()
   @UsePipes(ValidationPipe)
   criarCategoria(@Body() criarCategoriaDTO: CriaCategoriaDTO) {
-    this.clientAdminBackend.emit('criar-categoria', criarCategoriaDTO);
+    this.categoriasService.criarCategoria(criarCategoriaDTO);
   }
 
   @Get()
   async consultarCategorias() {
-    return await lastValueFrom(
-      this.clientAdminBackend.send('consultar-categorias', ''),
-    );
+    return await this.categoriasService.consultarCategorias();
   }
 
   @Get('/:idCategoria')
   async consultarCategoriaPeloId(@Param('idCategoria') idCategoria: string) {
-    return await lastValueFrom(
-      this.clientAdminBackend.send('consultar-categoria', idCategoria),
-    );
+    return await this.categoriasService.consultarCategoriaPeloId(idCategoria);
   }
 
   @Put('/:_id')
@@ -56,17 +43,6 @@ export class CategoriasController {
     @Body() atualizarCategoriaDTO: AtualizarCategoriaDTO,
     @Param('_id', ValidacaoParametrosPipe) _id: string,
   ) {
-    const categoriaEncontrada = await lastValueFrom(
-      this.clientAdminBackend.send('consultar-categoria', _id),
-    );
-
-    if (!categoriaEncontrada) {
-      throw new BadRequestException(`Categoria com id: ${_id} não encontrada!`);
-    }
-
-    this.clientAdminBackend.emit('atualizar-categoria', {
-      id: _id,
-      categoria: atualizarCategoriaDTO,
-    });
+    await this.categoriasService.atualizarCategoria(_id, atualizarCategoriaDTO);
   }
 }
