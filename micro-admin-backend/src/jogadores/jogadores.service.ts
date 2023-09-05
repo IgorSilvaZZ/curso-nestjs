@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { hash } from 'bcrypt';
 
 import { IJogador } from './interfaces/jogador.interface';
 import { Jogador } from './interfaces/jogador.schema';
@@ -17,7 +18,12 @@ export class JogadoresService {
   logger = new Logger(JogadoresService.name);
 
   async criarJogador(criarJogadorDTO: IJogador): Promise<IJogador> {
-    const jogador = new this.jogadorModel(criarJogadorDTO);
+    const senhaHash = await hash(criarJogadorDTO.senha, 10);
+
+    const jogador = new this.jogadorModel({
+      ...criarJogadorDTO,
+      senha: senhaHash,
+    });
 
     return await jogador.save();
   }

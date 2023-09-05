@@ -10,6 +10,7 @@ import { DesafiosModule } from './desafios/desafios.module';
 import { RankingsModule } from './rankings/rankings.module';
 import { ProxyRMQModule } from './proxymq/proxymq.module';
 import { ClientProxySmartRanking } from './proxymq/client-proxy';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ClientProxySmartRanking } from './proxymq/client-proxy';
     AwsModule,
     ProxyRMQModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
   ],
   controllers: [],
   providers: [ClientProxySmartRanking],

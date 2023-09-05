@@ -12,4 +12,7 @@ export class CriarJogadorDTO {
   readonly telefoneCelular: string;
 
   readonly categoria: string;
+
+  @IsNotEmpty()
+  readonly senha: string;
 }

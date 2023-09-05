@@ -24,6 +24,7 @@ export class JogadoresService {
   async criarJogador(criarJogadorDTO: CriarJogadorDTO) {
     const jogador = {
       nome: criarJogadorDTO.nome,
+      senha: criarJogadorDTO.senha,
       email: criarJogadorDTO.email,
       telefoneCelular: criarJogadorDTO.telefoneCelular,
     };

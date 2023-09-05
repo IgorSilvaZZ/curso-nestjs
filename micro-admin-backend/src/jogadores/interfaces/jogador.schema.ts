@@ -17,6 +17,9 @@ export class Jogador {
   email: string;
 
   @Prop()
+  senha: string;
+
+  @Prop()
   telefoneCelular: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Categoria.name })
