@@ -45,7 +45,7 @@ export class JogadoresService {
       this.clientAdminBackend.send('consultar-categoria', categoria),
     );
 
-    if (Object.values(categoriaExistente).length > 0) {
+    if (categoriaExistente && Object.values(categoriaExistente).length > 0) {
       this.clientAdminBackend.emit('criar-jogador', {
         categoria,
         jogador,

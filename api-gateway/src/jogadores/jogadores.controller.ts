@@ -8,6 +8,7 @@ import {
   Get,
   Put,
   Param,
+  Logger,
 } from '@nestjs/common';
 import {
   Delete,
@@ -26,6 +27,8 @@ import { JogadoresService } from './jogadores.service';
 @Controller('api/v1/jogadores')
 export class JogadoresController {
   constructor(private readonly jogadoresService: JogadoresService) {}
+
+  logger = new Logger(JogadoresController.name);
 
   @Post()
   @UsePipes(ValidationPipe)
