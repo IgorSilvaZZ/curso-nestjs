@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { AuthController } from './auth.controller';
 import { jwtConstants } from './constants/auth.constants';
+import { ProxyRMQModule } from '../proxymq/proxymq.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { jwtConstants } from './constants/auth.constants';
       secret: jwtConstants.options.secret,
       signOptions: { expiresIn: jwtConstants.options.signOptions.expiresIn },
     }),
+    ProxyRMQModule,
   ],
   controllers: [AuthController],
 })
