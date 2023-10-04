@@ -9,6 +9,7 @@ import {
   Put,
   Param,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import {
   Delete,
@@ -23,6 +24,7 @@ import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
 
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
 import { JogadoresService } from './jogadores.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
@@ -50,6 +52,7 @@ export class JogadoresController {
   }
 
   @Get('/:id')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async consultarJogador(@Param('id', ValidacaoParametrosPipe) id: string) {
     return await this.jogadoresService.consultarJogador(id);

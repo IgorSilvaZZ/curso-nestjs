@@ -8,7 +8,8 @@ import { AuthController } from './auth.controller';
 import { jwtConstants } from './constants/auth.constants';
 import { ProxyRMQModule } from '../proxymq/proxymq.module';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { JwtStrategy } from './jwt.strategy';
     ProxyRMQModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

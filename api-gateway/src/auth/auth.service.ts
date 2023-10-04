@@ -26,25 +26,21 @@ export class AuthService {
       this.clientAdminBackend.send('consultar-jogador-email', email),
     );
 
-    if (!jogador) {
-      throw new UnauthorizedException('Email/Senha Incorretos!');
+    if (!(await compare(senha, jogador.senha))) {
+      return null;
     }
 
-    if (!(await compare(senha, jogador.senha))) {
-      throw new UnauthorizedException('Email/Senha Incorretos!');
-    }
+    return jogador ?? null;
+  }
+
+  async autenticarUsuario(jogador: any) {
+    /* const jogador = await this.validarUsuario(
+      authLoginUsuarioDTO.email,
+      authLoginUsuarioDTO.senha,
+    ); */
 
     const token = await this.jwtService.signAsync({ sub: jogador.id });
 
-    return { jogador, token };
-  }
-
-  async autenticarUsuario(authLoginUsuarioDTO: AuthLoginUsuarioDTO) {
-    const { jogador, token } = await this.validarUsuario(
-      authLoginUsuarioDTO.email,
-      authLoginUsuarioDTO.senha,
-    );
-
-    return { jogador, token };
+    return { token };
   }
 }

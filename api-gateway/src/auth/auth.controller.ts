@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 
-import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { Controller, Logger, Post, Request, UseGuards } from '@nestjs/common';
 
-import { AuthLoginUsuarioDTO } from './dtos/auth-login-usuario.dto';
 import { AuthService } from './auth.service';
+import { LocalAuthGuard } from './guards/local.auth.guard';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -11,12 +11,18 @@ export class AuthController {
 
   private logger = new Logger(AuthController.name);
 
+  @UseGuards(LocalAuthGuard)
   @Post()
-  async autenticarUsuario(@Body() authLoginUsuarioDTO: AuthLoginUsuarioDTO) {
-    const { jogador, token } = await this.authService.autenticarUsuario(
+  async autenticarUsuario(
+    /* @Body() authLoginUsuarioDTO: AuthLoginUsuarioDTO */ @Request() req,
+  ) {
+    /* const { jogador, token } = await this.authService.autenticarUsuario(
       authLoginUsuarioDTO,
-    );
+    ); */
 
-    return { jogador, token };
+    return req.user;
+
+    /* this.logger.log(req);
+    return await this.authService.autenticarUsuario(req); */
   }
 }
