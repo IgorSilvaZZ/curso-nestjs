@@ -52,7 +52,6 @@ export class JogadoresController {
   }
 
   @Get('/:id')
-  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   async consultarJogador(@Param('id', ValidacaoParametrosPipe) id: string) {
     return await this.jogadoresService.consultarJogador(id);

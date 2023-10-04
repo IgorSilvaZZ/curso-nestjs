@@ -21,26 +21,25 @@ export class AuthService {
   private clientAdminBackend =
     this.clientProxySmartRaking.getClientProxyInstance();
 
-  async validarUsuario(email: string, senha: string) {
+  async validarUsuario({ email, senha }: AuthLoginUsuarioDTO) {
     const jogador = await lastValueFrom(
       this.clientAdminBackend.send('consultar-jogador-email', email),
     );
 
-    if (!(await compare(senha, jogador.senha))) {
-      return null;
+    if (!jogador) {
+      throw new UnauthorizedException('Email/Senha incorretos!');
     }
 
-    return jogador ?? null;
+    if (!(await compare(senha, jogador.senha))) {
+      throw new UnauthorizedException('Email/Senha incorretos!');
+    }
+
+    return jogador;
   }
 
   async autenticarUsuario(jogador: any) {
-    /* const jogador = await this.validarUsuario(
-      authLoginUsuarioDTO.email,
-      authLoginUsuarioDTO.senha,
-    ); */
-
     const token = await this.jwtService.signAsync({ sub: jogador.id });
 
-    return { token };
+    return { jogador, token };
   }
 }
