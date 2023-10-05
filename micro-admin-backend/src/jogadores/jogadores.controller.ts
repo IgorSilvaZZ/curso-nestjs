@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { BadRequestException, Controller } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import {
   Ctx,
@@ -33,10 +33,7 @@ async function ackMessageError(
 
 @Controller()
 export class JogadoresController {
-  constructor(
-    private readonly jogadoresService: JogadoresService,
-    private categoriaService: CategoriasService,
-  ) {}
+  constructor(private readonly jogadoresService: JogadoresService) {}
 
   logger = new Logger(JogadoresController.name);
 

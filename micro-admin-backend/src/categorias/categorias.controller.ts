@@ -86,9 +86,6 @@ export class CategoriasController {
 
       const categoria: ICategoria = data.categoria;
 
-      // this.logger.log(`id: ${JSON.stringify(_id)}`);
-      // this.logger.log(`categoria: ${JSON.stringify(categoria)}`);
-
       const categoriaAtualizada =
         await this.categoriasService.atualizarCategoria(_id, categoria);
 

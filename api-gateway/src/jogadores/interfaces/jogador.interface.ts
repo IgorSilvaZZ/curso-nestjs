@@ -3,6 +3,7 @@ export interface IJogador {
   readonly _id: string;
   readonly telefoneCelular: string;
   readonly email: string;
+  readonly senha: string;
   categoria: string;
   nome: string;
   ranking: string;

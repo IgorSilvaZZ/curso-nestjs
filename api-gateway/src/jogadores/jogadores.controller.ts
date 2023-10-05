@@ -8,6 +8,8 @@ import {
   Get,
   Put,
   Param,
+  Logger,
+  UseGuards,
 } from '@nestjs/common';
 import {
   Delete,
@@ -22,10 +24,13 @@ import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
 
 import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros.pipe';
 import { JogadoresService } from './jogadores.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('api/v1/jogadores')
 export class JogadoresController {
   constructor(private readonly jogadoresService: JogadoresService) {}
+
+  logger = new Logger(JogadoresController.name);
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -41,6 +46,7 @@ export class JogadoresController {
     return uploadArquivo;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async consultarJogadores() {
     return await this.jogadoresService.consultarJogadores();
