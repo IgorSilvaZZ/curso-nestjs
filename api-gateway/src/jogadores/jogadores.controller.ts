@@ -46,6 +46,7 @@ export class JogadoresController {
     return uploadArquivo;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async consultarJogadores() {
     return await this.jogadoresService.consultarJogadores();
