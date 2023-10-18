@@ -7,13 +7,13 @@ import { CriarJogadorDTO } from './dtos/criarJogador.dto';
 
 import { ClientProxySmartRanking } from '../proxymq/client-proxy';
 import { AtualizarJogadorDTO } from './dtos/atualizarjogador.dto';
-import { AwsService } from '../aws/aws.service';
+import { AwsS3Service } from '../aws/aws-s3.service';
 
 @Injectable()
 export class JogadoresService {
   constructor(
     private readonly clientProxySmartRaking: ClientProxySmartRanking,
-    private readonly awsService: AwsService,
+    private readonly aws3Service: AwsS3Service,
   ) {}
 
   private logger = new Logger(JogadoresService.name);
@@ -69,7 +69,7 @@ export class JogadoresService {
 
     // Enviar o arquivo para S3
     // Recuperar a URL de acesso
-    const { url: urlFotoJogador } = await this.awsService.uploadArquivo(
+    const { url: urlFotoJogador } = await this.aws3Service.uploadArquivo(
       file,
       id,
     );
