@@ -5,7 +5,7 @@ import { AwsSdkModule } from 'nest-aws-sdk';
 import { S3, Endpoint } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 
-import { AwsService } from './aws.service';
+import { AwsS3Service } from './aws-s3.service';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { AwsService } from './aws.service';
       services: [S3],
     }),
   ],
-  providers: [AwsService],
-  exports: [AwsService],
+  providers: [AwsS3Service],
+  exports: [AwsS3Service],
 })
 export class AwsModule {}
