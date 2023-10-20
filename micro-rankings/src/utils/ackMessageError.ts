@@ -13,5 +13,7 @@ export async function ackMessageError(
 
   if (filterAckError) {
     await channel.ack(originalMessage);
+
+    return;
   }
 }

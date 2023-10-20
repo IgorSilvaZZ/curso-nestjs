@@ -48,7 +48,10 @@ export class CategoriasController {
 
       if (filterAckError) {
         await channel.ack(originalMessage);
+        return;
       }
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -58,9 +61,22 @@ export class CategoriasController {
     const originalMessage = context.getMessage();
 
     try {
-      return await this.categoriasService.consultarCategorias();
-    } finally {
+      const categorias = await this.categoriasService.consultarCategorias();
+
       await channel.ack(originalMessage);
+
+      return categorias;
+    } catch (error) {
+      const filterAckError = ackErros.filter((ackError) =>
+        error.message.includes(ackError),
+      );
+
+      if (filterAckError) {
+        await channel.ack(originalMessage);
+        return;
+      }
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -70,9 +86,24 @@ export class CategoriasController {
     const originalMessage = context.getMessage();
 
     try {
-      return await this.categoriasService.consultarCategoriaPeloId(_id);
-    } finally {
+      const categoria = await this.categoriasService.consultarCategoriaPeloId(
+        _id,
+      );
+
       await channel.ack(originalMessage);
+
+      return categoria;
+    } catch (error) {
+      const filterAckError = ackErros.filter((ackError) =>
+        error.message.includes(ackError),
+      );
+
+      if (filterAckError) {
+        await channel.ack(originalMessage);
+        return;
+      }
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -101,7 +132,10 @@ export class CategoriasController {
 
       if (filterAckError) {
         await channel.ack(originalMessage);
+        return;
       }
+
+      await channel.nack(originalMessage);
     }
   }
 }

@@ -28,6 +28,7 @@ async function ackMessageError(
 
   if (filterAckError) {
     await channel.ack(originalMessage);
+    return;
   }
 }
 
@@ -44,9 +45,14 @@ export class JogadoresController {
 
     try {
       const jogadores = await this.jogadoresService.consultarTodosJogadores();
-      return jogadores;
-    } finally {
+
       await channel.ack(originalMessage);
+
+      return jogadores;
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -56,9 +62,15 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      return await this.jogadoresService.consultarJogadorPeloId(id);
-    } finally {
+      const jogador = await this.jogadoresService.consultarJogadorPeloId(id);
+
       await channel.ack(originalMessage);
+
+      return jogador;
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -71,9 +83,16 @@ export class JogadoresController {
     const originalMessage = context.getMessage();
 
     try {
-      return await this.jogadoresService.consultarJogadoresPeloEmail(email);
-    } finally {
+      const jogadorEmail =
+        await this.jogadoresService.consultarJogadoresPeloEmail(email);
+
       await channel.ack(originalMessage);
+
+      return jogadorEmail;
+    } catch (error) {
+      await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -100,6 +119,8 @@ export class JogadoresController {
       this.logger.log(error.message);
 
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -129,6 +150,8 @@ export class JogadoresController {
       this.logger.log(error.message);
 
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -144,6 +167,8 @@ export class JogadoresController {
       this.logger.log(error.message);
 
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 }

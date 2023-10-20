@@ -28,6 +28,8 @@ export class RankingsController {
       await channel.ack(originalMessage);
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -45,11 +47,13 @@ export class RankingsController {
         dataRef,
       );
 
+      await channel.ack(originalMessage);
+
       return rankings;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
-    } finally {
-      await channel.ack(originalMessage);
+
+      await channel.nack(originalMessage);
     }
   }
 }
