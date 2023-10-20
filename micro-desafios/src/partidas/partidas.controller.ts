@@ -32,6 +32,8 @@ export class PartidasController {
       // return partidaCriada;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 }

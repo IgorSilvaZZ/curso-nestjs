@@ -19,7 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   private logger = new Logger(JwtStrategy.name);
 
   async validate(payload: any) {
-    this.logger.log('CAIU NO VALIDATE JWT STRATEGY!!');
     return { jogador: payload.jogador };
   }
 }

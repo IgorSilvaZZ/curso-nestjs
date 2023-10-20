@@ -38,6 +38,8 @@ export class DesafiosController {
       return novoDesafio;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -64,6 +66,8 @@ export class DesafiosController {
       return desafioAtualizado;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -84,6 +88,8 @@ export class DesafiosController {
       await channel.ack(originalMessage);
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -101,6 +107,8 @@ export class DesafiosController {
       await channel.ack(originalMessage);
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -117,11 +125,13 @@ export class DesafiosController {
         idDesafio,
       );
 
+      await channel.ack(originalMessage);
+
       return desafio;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
-    } finally {
-      await channel.ack(originalMessage);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -142,6 +152,8 @@ export class DesafiosController {
       return desafiosJogador;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
@@ -158,29 +170,43 @@ export class DesafiosController {
       return desafios;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 
   @MessagePattern('consultar-desafios-realizado')
-  async consultarDesafiosRealizados(@Payload() payload: any, @Ctx() context: RmqContext) {
+  async consultarDesafiosRealizados(
+    @Payload() payload: any,
+    @Ctx() context: RmqContext,
+  ) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
 
     try {
       const { idCategoria, dataRef } = payload;
 
-      if (dataRef) {
-        return await this.desafiosService.consultarDesafiosRealizadosPelaData(idCategoria, dataRef) ;
-      } else {
-        return await this.desafiosService.consultarDesafiosRealizados(idCategoria);  
-      } 
+      let desafios = null;
 
-      
+      if (dataRef) {
+        desafios =
+          await this.desafiosService.consultarDesafiosRealizadosPelaData(
+            idCategoria,
+            dataRef,
+          );
+      } else {
+        desafios = await this.desafiosService.consultarDesafiosRealizados(
+          idCategoria,
+        );
+      }
+
+      await channel.ack(originalMessage);
+
+      return desafios;
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
-    } finally {
-      await channel.ack(originalMessage);
-    }
-  } 
 
+      await channel.nack(originalMessage);
+    }
+  }
 }

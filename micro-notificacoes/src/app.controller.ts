@@ -27,6 +27,8 @@ export class AppController {
       await channel.ack(originalMessage);
     } catch (error) {
       await ackMessageError(channel, originalMessage, error.message);
+
+      await channel.nack(originalMessage);
     }
   }
 }
